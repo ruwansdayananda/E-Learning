@@ -76,45 +76,4 @@ export class UserDao extends BaseDao {
     return rows[0];
   }
 
-  async getUserSubjects(email) {
-    const rows = await this.query(
-      `
-   SELECT * FROM eLearning.user WHERE email=?
-    `,
-      [email],
-    );
-
-    const usertype = rows[0].type;
-    let subjects=[];
-    if(usertype=="student"){
-      subjects = await this.query(
-      `
-      SELECT subject_id,subject FROM grade_subject INNER JOIN subject USING(subject_id) WHERE grade_id = (SELECT grade_id FROM student WHERE email=?)
-    `,
-      [email],
-    );
-     const grade = await this.query(
-      `SELECT grade_id,grade FROM student INNER JOIN grade USING(grade_id) WHERE student.email=?`,
-      [email],
-     ) ;  
-     subjects.push(grade[0]);
-    
-    }
-    else if(usertype=="teacher"){
-      const subjectTeacher = await this.query(
-      `
-      SELECT subject_id,subject FROM teacher INNER JOIN subject USING(subject_id) WHERE teacher.email=?
-    `,
-      [email],
-    );
-    subjects = await this.query(
-      `
-      SELECT grade_id,grade FROM grade;
-    `
-    );
-      subjects.push(subjectTeacher);
-    }
-    return subjects;
-  }
-
 }

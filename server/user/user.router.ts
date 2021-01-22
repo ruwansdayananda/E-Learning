@@ -47,7 +47,6 @@ export class UserRouter extends BaseRouter {
       res.json('success');
     });
     this.router.get('/get-user-information', this.getUserInformation.bind(this));
-    this.router.get('/get-user-subject', this.getUserSubjects.bind(this));
   }
 
   async signupUser(req, res) {
@@ -76,9 +75,6 @@ export class UserRouter extends BaseRouter {
   }
   async getUserInformation(req, res) {
     return res.json(await this.service.getUserInformation(req.session.passport.user));
-  }
-  async getUserSubjects(req, res) {
-    return res.json(await this.service.getUserSubjects(req.session.passport.user));
   }
 
 }
