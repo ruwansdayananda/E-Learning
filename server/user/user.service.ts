@@ -18,4 +18,9 @@ export class UserService extends BaseModule {
   async getUserInformation(email) {
     return await this.dao.getUserInformation(email);
   }
+
+  async getUserSubjects(email) {
+    return await this.dao.getUserSubjects(email);
+  }
+  
 }
