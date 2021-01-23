@@ -22,7 +22,7 @@ export class DatabaseConnection extends BaseModule {
       port: 3306,
       username: 'root',
       password: 'Windy@24',
-      database: 'eLearning',
+      database: 'learning',
       entities: [`${__dirname}/../**/*.entity.ts`],
       logging: false,
     });

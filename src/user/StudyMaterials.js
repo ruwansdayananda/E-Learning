@@ -4,49 +4,26 @@ import Typography from '@material-ui/core/Typography';
 import upload from "../images/upload.png";
 import {UploadFileButton} from "./UploadFileButton";
 import {makeStyles} from "@material-ui/core";
+import {useFetch} from "../core/fetch";
+import { Link } from "react-router-dom";
+
 
 const useStyles = makeStyles((theme) => ({
-    homePageMainContainer: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        paddingBottom: theme.spacing(3),
-    },
-    paper: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        width: '50vw',
-        padding: '20px 5vw 10vh',
-    },
-    uploadImage: {
-        width: '10vw',
-        margin: '20px',
-    },
-    uploadFilePaper: {
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '5%',
-        alignItems: 'center',
-        marginBottom: '20px',
-    },
 }));
 
 export const StudyMaterials = () => {
-  const classes = useStyles();
+  // const classes = useStyles();
+  // const type = 'assignment';
+  // const userType = 'student';
+  // const data = useFetch({ url: `/api/user/getFileInfo/?type=${type}&userType=${userType}&other=''` });
   return (
-    <div className={classes.homePageMainContainer}>
-      <Paper elevation={10} className={classes.paper}>
-        <Typography component="h1" variant="h3" align="center" color="textPrimary" gutterBottom>
-          What would you like to translate ?
-        </Typography>
-        <Paper elevation={3} className={classes.uploadFilePaper}>
-          <label htmlFor="upload-file">
-            <img src={upload} alt="upload image" className={classes.uploadImage} />
-          </label>
-         <UploadFileButton/>
-        </Paper>
-      </Paper>
-    </div>
+      <div></div>
+    // <div style={{marginTop: '100px'}}>
+    //      <UploadFileButton type="assignments" userType='student' subject='Science' grade='Grade 5' userEmail='180424d@uom.lk'/>
+    //      data.map((item,index)){
+    //          <a href={`http://localhost:8000/api/user/getFile/${item.upload_id}`}>Download</a>
+    //     }
+    // </div>
   );
+
 };

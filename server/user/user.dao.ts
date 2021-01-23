@@ -37,18 +37,19 @@ export class UserDao extends BaseDao {
       ],
     );
   }
-  async saveFileInfo({ order_number, document_name, document_status, client_id }) {
-
+  async saveFileInfo(data) {
     return await this.query(
       `
-        INSERT INTO document_details (order_number, document_name, document_status, client_id)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO upload (upload_id, file_name, file_size, file_type, upload_date, mimetype)
+        VALUES (?, ?, ?, ?, ?, ?)
     `,
       [
-          order_number,
-          document_name,
-          document_status,
-          client_id,
+          data.upload_id,
+          data.file_name,
+          data.file_size,
+          data.file_type,
+          data.upload_date,
+          data.mimetype,
       ],
     );
   }
@@ -59,16 +60,92 @@ export class UserDao extends BaseDao {
   async getUser(email) {
     const rows = await this.query(
       `
-    SELECT * FROM eLearning.user WHERE email=?
+    SELECT * FROM user WHERE email=?
     `,
       [email],
     );
     return rows[0];
-  }
+  };
+  async getFileName(upload_id) {
+    const fileName= await this.query(
+      `
+    SELECT file_name FROM upload WHERE upload_id= ?;
+    `, [upload_id]
+    );
+    return fileName[0];
+  };
+
+  async getFileInfo(data) {
+      const type = data.type;
+      const userType = data.userType;
+      const user = data.user;
+      let getData;
+      let userGrade;
+      let userSubject;
+      if(userType === 'student'){
+           userGrade = await this.query(
+              `
+    SELECT grade FROM student where email= ?;
+    `, [user]
+          );
+      };
+      if(userType === 'teacher'){
+          userSubject = await this.query(
+              `
+    SELECT subject_id FROM teacher where email= ?;
+    `, [user]
+          );
+      };
+      if(type === 'assignment' && userType === 'student') {
+           getData= await this.query(
+              `
+    SELECT * FROM assignment where grade= ?;
+    `, [userGrade]
+          );
+      } else if(type === 'assignment' && userType === 'teacher') {
+          getData= await this.query(
+              `
+        SELECT * FROM assignment where user_email= ?;
+        `, [user]
+          );
+      }else if(type === 'submission' && userType === 'student') {
+          getData= await this.query(
+              `
+    SELECT * FROM submission where user_email= ?;
+    `, [user]
+          );
+      }else if(type === 'submission' && userType === 'teacher') {
+          getData= await this.query(
+              `
+    SELECT * FROM submission where grade= ?;;
+        `, [userSubject]
+          );
+      }else if(type === 'study_material' && userType === 'student') {
+          getData= await this.query(
+              `
+    SELECT * FROM study_material where grade= ?;
+    `, [userGrade]
+          );
+      }else if(type === 'study_material' && userType === 'teacher') {
+          getData= await this.query(
+              `
+    SELECT * FROM study_material where user_email= ?;
+        `, [user]
+          );
+      }
+    if (getData[0] === undefined) {
+        return getData
+    }else {
+        return getData[0]
+    }
+
+
+  };
+
   async getUserInformation(email) {
     const rows = await this.query(
       `
-    SELECT * FROM eLearning.user WHERE email=?
+    SELECT * FROM user WHERE email=?
     `,
       [email],
     );
