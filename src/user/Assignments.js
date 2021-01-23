@@ -12,13 +12,11 @@ import Typography from '@material-ui/core/Typography';
 import user1 from "../images/user1.jpg";
 import { fetch,useFetch } from '../core/fetch';
 import Alert from '@material-ui/lab/Alert';
-
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import ErrorIcon from '@material-ui/icons/Error';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import axios,{post} from 'axios';
-
 
 
 //Used for styling
