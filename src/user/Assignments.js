@@ -12,27 +12,12 @@ import Typography from '@material-ui/core/Typography';
 import user1 from "../images/user1.jpg";
 import { fetch,useFetch } from '../core/fetch';
 import Alert from '@material-ui/lab/Alert';
-import { RepeatOne } from '@material-ui/icons';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import FormatAlignLeftIcon from '@material-ui/icons/FormatAlignLeft';
-import FormatAlignCenterIcon from '@material-ui/icons/FormatAlignCenter';
-import FormatAlignRightIcon from '@material-ui/icons/FormatAlignRight';
-import FormatAlignJustifyIcon from '@material-ui/icons/FormatAlignJustify';
+
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import ErrorIcon from '@material-ui/icons/Error';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import { InlineWrapper } from '@material-ui/pickers/wrappers/InlineWrapper';
-import { UploadFileButton } from './UploadFileButton';
-import { AdvancedConsoleLogger } from 'typeorm';
 import axios,{post} from 'axios';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Slide from '@material-ui/core/Slide';
-import { render } from 'react-dom';
 
 
 
@@ -99,7 +84,13 @@ const useStyles = makeStyles((theme) => ({
   backImage:{
     background: `url(${user1})`,
     backgroundSize:'400%',
-  }
+  },
+  alert: {
+    width: '100%',
+    '& > * + *': {
+      marginTop: theme.spacing(2),
+    },
+  },
 
 
 }));
@@ -213,7 +204,14 @@ const DueAssignmentCards = ()=>{
   console.log(assignments[0]);
   const classes = useStyles();
   const list = [];
+
   for(const assignment of assignments){
+    const values={
+      isNoFile:true,
+    }
+    if(assignment.upload_id!=null){
+      values.isNoFile = false;
+    }
     list.push(<>
     <Card className={classes.root}>
         <CardContent>
@@ -230,12 +228,13 @@ const DueAssignmentCards = ()=>{
           <Alert severity="error">This assignment will be due on {assignment.due_date}.</Alert>
         </CardContent>
       <CardActions>
-<Button
+      <Button
   variant="contained"
   component="label"
   color="primary"
   className = {classes.uploadButton}
   onClick={ ()=>{DownloadAssignment(assignment.upload_id)}}
+  hidden={values.isNoFile}
 >
   Download Assignment
 </Button>
@@ -260,8 +259,6 @@ const DueAssignmentCards = ()=>{
   >
           Submit
         </Button>
-
-
       </CardActions>
     </Card><Box m={2} /></>)
   }
@@ -271,13 +268,18 @@ const DueAssignmentCards = ()=>{
 
 }
 
+
+
 let temp_files;
 const onChange =async (e)=>{
   let files = e.target.files;
   temp_files = files;
 }
 
+
+
 const OnClick =async (assignment)=>{
+  if(temp_files!=undefined){
   let files = temp_files;
   let data = new FormData();
   data.append('file',files[0],);
@@ -285,7 +287,12 @@ const OnClick =async (assignment)=>{
  
   await axios.post('/api/user/upload-file',data).then(res=>{console.log(res)});
   alert("Submission Successful ! ");
-  window.location.reload(false);
+  window.location.reload(false);}
+  else{
+    alert("Upload A File To Submit ! ");
+  }
+  
+
 }
 
 const CompletedAssignmentCards = ()=>{
@@ -307,6 +314,7 @@ const CompletedAssignmentCards = ()=>{
            {assignment.description}
           </Typography>
           <Box m={0.5} />
+
           <Alert severity="success">Assignment has been submitted.</Alert>
         </CardContent>
     </Card><Box m={2} /></>)
@@ -317,15 +325,15 @@ const CompletedAssignmentCards = ()=>{
 }
 
 const DownloadAssignment=async (upload_id)=>{
-   const res = await fetch({
-   url: '/api/user/filelocation',
-   method: 'post',
-   body: {upload_id:upload_id},
-    });
-    const file_name = res.file_name;
+  //  const res = await fetch({
+  //  url: '/api/user/filelocation',
+  //  method: 'post',
+  //  body: {upload_id:upload_id},
+  //   });
+  //   const file_name = res.file_name;
 
-     openInNewTab(process.env.PUBLIC_URL+'/uploads/teacher/'+file_name);
-    
+  
+    openInNewTab("http://localhost:8000/api/user/getFile/"+upload_id);
 
 }
 
@@ -334,5 +342,7 @@ const openInNewTab = (url) => {
   if (newWindow) newWindow.opener = null
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

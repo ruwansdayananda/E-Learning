@@ -201,9 +201,21 @@ export class UserRouter extends BaseRouter {
     console.log(data.user);
     return res.json(await this.service.getFileInfo(data));
   }
+  // async getFile(req, res) {
+  //   const fileName = await this.service.getFileName(req.upload_id);
+  //   const location = `${__dirname}/../uploads/${req.upload_id}`;
+  //   return res.download(location, fileName.file_name);
+  // }
+
+  //Wimukthi's
+
   async getFile(req, res) {
     const fileName = await this.service.getFileName(req.upload_id);
-    const location = `${__dirname}/../uploads/${req.upload_id}`;
-    return res.download(location, fileName.file_name);
+    const file = JSON.parse(JSON.stringify(fileName)).file_name;
+    console.log(file);
+    const location = `${__dirname}/../uploads/${file}`;
+    console.log(location);
+    res.download(location);
   }
+  
 }
