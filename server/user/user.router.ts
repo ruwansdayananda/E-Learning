@@ -5,7 +5,7 @@ import passport from 'passport';
 import Stripe from 'stripe';
 const upload = require('express-fileupload');
 const express = require('express');
-const fs= require('fs');
+import { v4 as uuidv4 } from 'uuid';
 
 const stripe = new Stripe(
   'sk_test_51HGUvrDOqWcprKpuZu6vskBRg0M6PNsdvQMN0LUyIOuZi97hyNjmLyWfuKgDxiG6s3YKdgaM1a5G70KqIM1Txwpa00OWsn7Ja1',
@@ -13,18 +13,41 @@ const stripe = new Stripe(
     apiVersion: '2020-08-27',
   },
 );
+import fs from 'fs';
+import shell from 'shelljs';
+function getExtension(filename) {
+  const i = filename.lastIndexOf('.');
+  return i < 0 ? '' : filename.substr(i);
+}
 export class UserRouter extends BaseRouter {
   service = inject(UserService);
   registerRoutes() {
     console.log("user.router.js");
+    this.router.get('/getFile/:upload_id', (req: any, res) => {
+      const upload_id = req.params['upload_id'];
+      this.getFile.bind(this)({...req,upload_id},res)
+    });
+    this.router.get('/getFileInfo/', (req: any, res) => {
+      const type = req.query.type;
+      const userType = req.query.userType;
+      this.getFileInfo.bind(this)({...req,type, userType},res)
+    });
     this.router.post('/upload', (req: any, res) => {
+      const fileName = uuidv4();
+      console.log(fileName);
       if (req.files === null) {
         return res.status(400).json({ msg: 'No file uploaded' });
       }
-      console.log(req);
-      this.saveFileInfo.bind(this);
       const file = req.files.file;
-      file.mv(`${__dirname}/../../public/uploads/${file.name}`, (err) => {
+      const directoryLocation = `${__dirname}/../../server/uploads/`;
+      const location = `${__dirname}/../../server/uploads/${fileName}`;
+
+      if (!fs.existsSync(directoryLocation)){
+        fs.mkdirSync(directoryLocation);
+      }
+      // this.saveFileInfo.bind(this)(req, res);
+      this.saveFileInfo({...req,fileName}, res);
+      file.mv(location, (err) => {
         if (err) {
           return res.status(500).send(err);
         }
@@ -37,8 +60,8 @@ export class UserRouter extends BaseRouter {
         function(req, res, next) {
           console.log("user/login");
           passport.authenticate('local', function(err, user, info) {
-            if (err) { return res.json('error');; }
-            if (!user) { return res.json('error');; }
+            if (err) { return res.json('error'); }
+            if (!user) { return res.json('error'); }
             req.logIn(user, function(err) {
               if (err) { return next(err); }
               res.json('success');
@@ -152,10 +175,14 @@ export class UserRouter extends BaseRouter {
     });
     res.json({ msg: 'Sign Up Success!', status: 'success' });
   }
+
   async saveFileInfo(req, res) {
-    const data =  [1003, 'designPatterns.docx', 'translated', 1005] ;
+    const upload_id = req.fileName;
+    const file = req.files.file;
+    const data = {upload_id:upload_id, file_name: file.name, file_size: `${file.size}KB`, file_type: getExtension(file.name), upload_date:new Date().toISOString().substring(0, 10), mimetype: file.mimetype}
     await this.service.saveFileInfo(data);
   }
+
   async checkAuthenticated(req, res) {
     if (req.isAuthenticated()) {
       return res.json({ session: true });
@@ -169,4 +196,14 @@ export class UserRouter extends BaseRouter {
   
 
 
+  async getFileInfo(req, res) {
+    const data = {type: req.type,userType: req.userType, user: req.session.passport.user};
+    console.log(data.user);
+    return res.json(await this.service.getFileInfo(data));
+  }
+  async getFile(req, res) {
+    const fileName = await this.service.getFileName(req.upload_id);
+    const location = `${__dirname}/../uploads/${req.upload_id}`;
+    return res.download(location, fileName.file_name);
+  }
 }
