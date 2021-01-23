@@ -24,7 +24,6 @@ function getExtension(filename) {
 export class UserRouter extends BaseRouter {
   service = inject(UserService);
   registerRoutes() {
-<<<<<<< HEAD
     console.log("user.router.js");
     this.router.get('/getFile/:upload_id', (req: any, res) => {
       const upload_id = req.params['upload_id'];
@@ -35,9 +34,7 @@ export class UserRouter extends BaseRouter {
       const userType = req.query.userType;
       this.getFileInfo.bind(this)({...req,type, userType},res)
     });
-=======
     /*
->>>>>>> origin/nuwan-2
     this.router.post('/upload', (req: any, res) => {
       const fileName = uuidv4();
       console.log(fileName);
@@ -83,7 +80,6 @@ export class UserRouter extends BaseRouter {
   });
   
     this.router.get('/get-user-information', this.getUserInformation.bind(this));
-<<<<<<< HEAD
     this.router.get('/assignments',this.listAssignments.bind(this));
     this.router.get('/completed-assignments',this.listCompletedAssignments.bind(this));
 
@@ -93,6 +89,33 @@ export class UserRouter extends BaseRouter {
     this.router.post('/filelocation',this.getFileLocation.bind(this));
 
     this.router.post('/upload-file',this.uploadSubmission.bind(this));
+
+    this.router.get('/get-teacher-subjects', this.getTeacherSubject.bind(this));
+
+    this.router.get('/get-available-grades', this.getAvailableGrades.bind(this));
+
+    this.router.post('/assingmentsubmit', this.saveAssignment.bind(this));
+
+    this.router.post('/upload' , (req :any, res)=>{
+      if(req.files ===null){
+          return res.status(400).json({msg: 'No file uploaded'})
+  
+      }
+      
+      const file = req.files.file;
+     
+      file.mv(`${__dirname}/../../server/uploads/${file.name}` , err=>{
+          if(err){
+              console.log(err)
+              return res.status(500).send(err)
+          }
+  
+          res.json({fileName: file.name, filePath: `/uploads/${file.name}`});
+  
+      })
+  
+  
+  })
 
 
   }
@@ -135,42 +158,13 @@ export class UserRouter extends BaseRouter {
     let updated_upload_id = result[0].upload_id;
     return res.json(await this.service.writeToSubmissionTable(updated_upload_id,assignment.assignment_id,email));
      
- 
 
   }
   async listCompletedAssignments(req,res){
     const studentInformation =await this.service.getStudentInformation(req.session.passport.user);
     const email = studentInformation.email;
-    return res.json(await this.service.listCompletedAssignments(email));
+    return res.json(await this.service.listCompletedAssignments(email)); 
 
-=======
-
-    this.router.get('/get-teacher-subjects', this.getTeacherSubject.bind(this));
-
-    this.router.get('/get-available-grades', this.getAvailableGrades.bind(this));
-
-    this.router.post('/assingmentsubmit', this.saveAssignment.bind(this));
-
-    this.router.post('/upload' , (req :any, res)=>{
-      if(req.files ===null){
-          return res.status(400).json({msg: 'No file uploaded'})
-  
-      }
-      
-      const file = req.files.file;
-     
-      file.mv(`${__dirname}/../../server/uploads/${file.name}` , err=>{
-          if(err){
-              console.log(err)
-              return res.status(500).send(err)
-          }
-  
-          res.json({fileName: file.name, filePath: `/uploads/${file.name}`});
-  
-      })
-  
-  
-  })
 
   }
   
@@ -183,7 +177,6 @@ export class UserRouter extends BaseRouter {
     )
     
   
->>>>>>> origin/nuwan-2
   }
 
   async listAssignments(req,res){

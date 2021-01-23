@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -18,7 +17,6 @@ import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import ErrorIcon from '@material-ui/icons/Error';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import axios,{post} from 'axios';
-=======
 import React, { useState, Fragment } from 'react';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { Form, FormInput, FormDate, FormDateAssignment } from '../core/signup';
@@ -43,7 +41,6 @@ import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/picker
 import Fab from '@material-ui/core/Fab';
 import HomeTwoToneIcon from '@material-ui/icons/HomeTwoTone';
 import NoteAddTwoToneIcon from '@material-ui/icons/NoteAddTwoTone';
->>>>>>> origin/nuwan-2
 
 
 //Used for styling
@@ -52,12 +49,13 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-<<<<<<< HEAD
     background:'#005662',
     overflowY:'auto',
     overflowX:'hidden',
     height:'100vh',
     margin:0,
+    padding: theme.spacing(10),
+    paddingBottom: theme.spacing(3),
     },
   mainImage: {
     padding: '100px 5% 0',
@@ -118,15 +116,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 
-
-}));
-
-
 //The main component of the file (Other components are rendered by this)
-=======
-    padding: theme.spacing(10),
-    paddingBottom: theme.spacing(3),
-  },
 
   button: {
     margin: '5%',
@@ -219,7 +209,6 @@ function create_UUID() {
 
 
 
->>>>>>> origin/nuwan-2
 export const Assignments = () => {
 
 
@@ -326,7 +315,6 @@ const DueAssignmentCards = ()=>{
   const assignments=useFetch({ url: '/api/user/assignments' });
   console.log(assignments[0]);
   const classes = useStyles();
-<<<<<<< HEAD
   const list = [];
 
   for(const assignment of assignments){
@@ -470,7 +458,6 @@ const openInNewTab = (url) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-=======
   const [showAlert, setShowAlert] = useState(false);
   const [ShowAlert_date, setShowAlert_date] = useState(false);
   const userInformation = useFetch({ url: '/api/user/get-user-information' });
@@ -805,5 +792,4 @@ const openInNewTab = (url) => {
 
   }
 
-};
->>>>>>> origin/nuwan-2
+

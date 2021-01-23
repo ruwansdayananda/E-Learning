@@ -37,9 +37,7 @@ export class UserDao extends BaseDao {
       ],
     );
   }
-<<<<<<< HEAD
-  async saveFileInfo(data) {
-=======
+
   async saveAssignment({ title, due_date, description, upload_id, assignment_id, user_email, subject_id, grade_id, upload_date, file_name, file_type, file_size, mimetype }) {
     
     if(upload_id !=''){
@@ -67,28 +65,19 @@ export class UserDao extends BaseDao {
     );
 
   }
-  async saveFileInfo({ order_number, document_name, document_status, client_id }) {
-
->>>>>>> origin/nuwan-2
+  async saveFileInfo(data) {
     return await this.query(
       `
         INSERT INTO upload (upload_id, file_name, file_size, file_type, upload_date, mimetype)
         VALUES (?, ?, ?, ?, ?, ?)
     `,
       [
-<<<<<<< HEAD
           data.upload_id,
           data.file_name,
           data.file_size,
           data.file_type,
           data.upload_date,
           data.mimetype,
-=======
-        order_number,
-        document_name,
-        document_status,
-        client_id,
->>>>>>> origin/nuwan-2
       ],
     );
   }
@@ -211,7 +200,6 @@ async listCompletedAssignments(email){
     return rows[0];
   }
 
-<<<<<<< HEAD
   async getStudentInformation(email){
     const rows = await this.query(
       `SELECT * FROM eLearning.student WHERE email = ? `,[email]
@@ -258,7 +246,6 @@ async listCompletedAssignments(email){
   }
 
 
-=======
   async getTeacherSubject(email) {
     const rows = await this.query(
       `
@@ -286,5 +273,4 @@ async listCompletedAssignments(email){
 
 
 
->>>>>>> origin/nuwan-2
 }
