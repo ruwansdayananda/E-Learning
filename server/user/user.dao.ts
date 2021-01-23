@@ -58,7 +58,7 @@ export class UserDao extends BaseDao {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
       [
-        assignment_id, upload_id, user_email, subject_id, grade_id, dayjs(due_date).format('YYYY-MM-DD'), title, description, dayjs(upload_date).format('YYYY-MM-DD')
+        assignment_id, upload_id, user_email, subject_id, grade_id, due_date, title, description, dayjs(upload_date).format('YYYY-MM-DD')
 
       ],
     );
