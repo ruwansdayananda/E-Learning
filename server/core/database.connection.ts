@@ -21,7 +21,11 @@ export class DatabaseConnection extends BaseModule {
       host: 'localhost',
       port: 3306,
       username: 'root',
+<<<<<<< HEAD
       password: 'root',
+=======
+      password: 'nuwansql',
+>>>>>>> origin/nuwan-2
       database: 'eLearning',
       entities: [`${__dirname}/../**/*.entity.ts`],
       logging: false,
