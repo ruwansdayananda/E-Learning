@@ -8,6 +8,9 @@ export class UserService extends BaseModule {
   async saveUser(data) {
     return await this.dao.saveUser(data);
   }
+  async saveAssignment(data) {
+    return await this.dao.saveAssignment(data);
+  }
   async saveFileInfo(data) {
     return await this.dao.saveFileInfo(data);
   }
@@ -17,5 +20,12 @@ export class UserService extends BaseModule {
 
   async getUserInformation(email) {
     return await this.dao.getUserInformation(email);
+  }
+
+  async getTeacherSubject(email) {
+    return await this.dao.getTeacherSubject(email);
+  }
+  async getAvailableGrades() {
+    return await this.dao.getAvailableGrades();
   }
 }
