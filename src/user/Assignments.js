@@ -555,7 +555,7 @@ const currentUserType = userInformation.type;
     );
   
   }
-  else{
+  if (currentUserType === 'student'){
     console.log("Hi");
     return(<div><div className={classes.backImage}></div><div className={classes.homePageMainContainer}>
       <Grid container spacing={3} className={classes.mainImage}>
