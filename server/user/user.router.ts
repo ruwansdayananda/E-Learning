@@ -71,6 +71,9 @@ export class UserRouter extends BaseRouter {
       res.json('success');
     });
     this.router.get('/get-user-information', this.getUserInformation.bind(this));
+    this.router.get('/get-marks-information', this.getMarksInformation.bind(this));
+    this.router.get('/get-grade-information', this.getGrade.bind(this));
+    this.router.get('/get-gpa-information', this.getStudentGPA.bind(this));
   }
 
   async signupUser(req, res) {
@@ -104,6 +107,15 @@ export class UserRouter extends BaseRouter {
   async getUserInformation(req, res) {
     return res.json(await this.service.getUserInformation(req.session.passport.user));
   }
+  async getMarksInformation(req, res) {
+    return res.json(await this.service.getMarksInformation(req.session.passport.user));
+  }
+  async getGrade(req, res) {
+    return res.json(await this.service.getGrade(req.session.passport.user));
+  }
+  async getStudentGPA(req, res) {
+    return res.json(await this.service.getStudentGPA(req.session.passport.user));
+  }
   async getFileInfo(req, res) {
     const data = {type: req.type,userType: req.userType, user: req.session.passport.user};
     console.log(data.user);
@@ -114,4 +126,6 @@ export class UserRouter extends BaseRouter {
     const location = `${__dirname}/../uploads/${req.upload_id}`;
     return res.download(location, fileName.file_name);
   }
+
+
 }

@@ -7,19 +7,19 @@ export class UserDao extends BaseDao {
       if (signInAs === 'student'){
           await this.query(
               `
-        INSERT INTO student (email,grade)
+        INSERT INTO student (email,grade_id)
         VALUES (?, ?)
     `,
-              [email,grade],
+              [email,6],
           );
       }
       if (signInAs === 'teacher'){
           await this.query(
               `
-        INSERT INTO teacher (email,subject,telephone)
+        INSERT INTO teacher (email,subject_id,telephone)
         VALUES (?, ?, ?)
     `,
-              [email,subject,telephone],
+              [email,1,telephone],
           );
       }
     return await this.query(
@@ -152,5 +152,42 @@ export class UserDao extends BaseDao {
 
     return rows[0];
   }
+
+  async getMarksInformation(email) {
+    const rows = await this.query(
+      `
+      SELECT * FROM mark WHERE student_email=?
+    `,
+      [email],
+    );
+    return rows[0];
+  };
+
+  async getGrade(email) {
+    const rows = await this.query(
+      `
+      SELECT * FROM grade WHERE grade_id = (SELECT grade_id FROM student WHERE email=?)
+    `,
+      [email],
+    );
+    return rows[0];
+  };
+
+  async getStudentGPA(email) {
+    const rows = await this.query(
+      `
+      SELECT * FROM student_performance WHERE student_email=?
+    `,
+      [email],
+    );
+    return rows[0];
+  };
+
+
+
+
+  
+
+
 
 }
