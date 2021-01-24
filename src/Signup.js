@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@material-ui/core';
 import { Form, FormDate, FormInput, FormSelect } from './core/signup';
-import { fetch } from './core/fetch';
+import { useFetch,fetch } from './core/fetch';
 import { Alert } from '@material-ui/lab';
 import { useStyles } from './styles';
 import Grid from '@material-ui/core/Grid';
@@ -18,7 +18,7 @@ export const Signup = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
   const [isStudent, setIsStudent] = useState(false);
-  const [, setTeachingSubject] = useState('');
+  const [teachingSubject, setTeachingSubject] = useState('');
   const [, setGrade] = useState('');
   const [, setSignInAs] = useState('');
 
@@ -61,6 +61,16 @@ export const Signup = () => {
     confirmPassword: Yup.string()
         .oneOf([Yup.ref('password'), null], 'Passwords must match')
   });
+
+  const availableGrades = useFetch({ url: '/api/user/get-available-grades' });
+  const currentSubjects = useFetch({url: '/api/user/getSubjects'});
+  // const availableSubjects = useFetch({ url: '/api/user/get-available-subjects' });
+  var menuItems = []
+
+  for (const [index, value] of availableGrades.entries()) {
+
+    menuItems.push(<MenuItem value={value.grade_id}>{value.grade.charAt(0).toUpperCase() + value.grade.slice(1)}</MenuItem>)
+  }
   return (
     <Grid container component="main" className={classes.root}>
       <Grid item sm={false} md={6} className={classes.loginImage} />
@@ -79,13 +89,14 @@ export const Signup = () => {
               name: '',
               email: '',
               signInAs: '',
-              grade: '',
-              teachingSubject: '',
+              grade_id: '',
+              subject_id: '',
               telephone:'',
               birthday: Date.now(),
             }}
 
             onSubmit={async (data) => {
+              console.log(data)
               const res = await fetch({
                 url: '/api/user/signup',
                 method: 'post',
@@ -112,76 +123,31 @@ export const Signup = () => {
               <MenuItem value="teacher">Teacher</MenuItem>
               <MenuItem value="admin">Admin</MenuItem>
             </FormSelect>
+            {console.log(teachingSubject)}
+            {console.log(currentSubjects)}
             {isTeacher && (
                 <div>
               <FormSelect
-                name="subject"
+                name="subject_id"
                 label="Teaching Subject"
                 className={classes.formContent}
                 onChange={getTeachingSubject}
               >
-                <MenuItem name="buddhism" value="Buddhism">
-                  Buddhism
-                </MenuItem>
-                <MenuItem name="English Language" value="English Language">
-                  English Language
-                </MenuItem>
-                <MenuItem name="Science" value="Science">
-                  Science
-                </MenuItem>
-                <MenuItem name="Mathematics" value="Mathematics">
-                  Mathematics
-                </MenuItem>
-                <MenuItem name="Sinhala" value="Sinhala">
-                  Sinhala
-                </MenuItem>
-                <MenuItem name="History" value="History">
-                  History
-                </MenuItem>
-                <MenuItem name="Commerce" value="Commerce">
-                  Commerce
-                </MenuItem>
-                <MenuItem name=" Information Technology" value="Information Technology">
-                  Information Technology
-                </MenuItem>
-                <MenuItem name="Geography" value="Geography">
-                  Geography
-                </MenuItem>
+              {currentSubjects.map((subject)=><MenuItem value={subject.subject_id}>
+                  {subject.subject}
+                </MenuItem>)}
               </FormSelect>
               <FormInput name="telephone" label="Telephone Number" className={classes.formContent} />
                 </div>
             )}
             {isStudent && (
                 <FormSelect
-                    name="grade"
+                    name="grade_id"
                     label="Grade"
                     className={classes.formContent}
                     onChange={getGrade}
                 >
-                  <MenuItem name="Grade 6" value="Grade 6">
-                    Grade 6
-                  </MenuItem>
-                  <MenuItem name="Grade 7" value="Grade 7">
-                    Grade 7
-                  </MenuItem>
-                  <MenuItem name="Grade 8" value="Grade 8">
-                    Grade 8
-                  </MenuItem>
-                  <MenuItem name="Grade 9" value="Grade 9">
-                    Grade 9
-                  </MenuItem>
-                  <MenuItem name="Grade 10" value="Grade 10">
-                    Grade 10
-                  </MenuItem>
-                  <MenuItem name="Grade 11" value="Grade 11">
-                    Grade 11
-                  </MenuItem>
-                  <MenuItem name="Grade 12" value="Grade 12">
-                    Grade 12
-                  </MenuItem>
-                  <MenuItem name="Grade 13" value="Grade 13">
-                    Grade 13
-                  </MenuItem>
+                 {menuItems}
                 </FormSelect>
             )}
             <FormInput name="email" label="Email" type="email" className={classes.formContent} />

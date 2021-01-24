@@ -3,14 +3,14 @@ import dayjs from 'dayjs';
 import bcrypt from 'bcryptjs';
 
 export class UserDao extends BaseDao {
-  async saveUser({ name, birthday, signInAs, email, password, grade, subject, telephone }) {
+  async saveUser({ name, birthday, signInAs, email, password, grade_id, subject_id, telephone }) {
     if (signInAs === 'student') {
       await this.query(
         `
         INSERT INTO student (email,grade_id)
         VALUES (?, ?)
     `,
-        [email, 2],
+        [email, grade_id],
       );
     }
     if (signInAs === 'teacher') {
@@ -19,7 +19,7 @@ export class UserDao extends BaseDao {
         INSERT INTO teacher (email,subject_id,telephone)
         VALUES (?, ?, ?)
     `,
-        [email, 1, telephone],
+        [email, subject_id, telephone],
       );
     }
     return await this.query(
@@ -248,11 +248,11 @@ async listCompletedAssignments(email){
   async getMarksInformation(email) {
     const rows = await this.query(
       `
-      SELECT * FROM mark WHERE student_email=?
+      SELECT title,marks,teacher_email,subject.subject FROM mark LEFT OUTER JOIN (assignment left outer join subject on assignment.subject_id=subject.subject_id) ON mark.assignment_id=assignment.assignment_id  WHERE student_email=?
     `,
       [email],
     );
-    return rows[0];
+    return rows;
   };
 
   async getGrade(email) {
@@ -459,6 +459,63 @@ async getTeacherAssignmets(email) {
        }
 
     return rows;
+  }
+
+  async getGrades() {
+    const data =  await this.query(`
+  SELECT * FROM Grade`);
+    if (data === []) {
+      return data
+    }else{
+      return data;
+    }
+  }
+
+
+  async addSubject(data) {
+    return await data.map((value) =>{
+      this.query(
+          `
+        INSERT INTO subject (subject)
+        VALUES (?)
+    `,
+          [
+           value
+          ],
+      )
+    });
+  }
+  async getSubjects() {
+    const data =  await this.query(`
+  SELECT * FROM subject`);
+    if (data === []) {
+      return data
+    }else{
+      return data;
+    }
+  }
+  async addGradeSubjects(data) {
+    return await data.map((value) =>{
+      this.query(
+          `
+        INSERT INTO grade_subject (grade_id , subject_id)
+        VALUES (? , ?)
+    `,
+          [
+            value.grade_id,
+            value.subject_id,
+          ],
+      )
+    });
+  }
+  async getGradeSubjects() {
+    const data =  await this.query(`
+  SELECT * FROM grade_subject`);
+    if (data === []) {
+      return data
+    }else{
+      return data;
+    }
   }
 
 }

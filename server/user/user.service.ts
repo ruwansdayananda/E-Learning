@@ -103,6 +103,22 @@ export class UserService extends BaseModule {
   async getAvailableGrades() {
     return await this.dao.getAvailableGrades();
   }
+  async addSubject(data) {
+    return await this.dao.addSubject(data);
+  }
+  async getSubjects() {
+    return await this.dao.getSubjects();
+  }
+  async addGradeSubjects(data) {
+    return await this.dao.addGradeSubjects(data);
+  }
+  async getGradeSubjects() {
+    return await this.dao.getGradeSubjects();
+  }
+
+  async getGrades() {
+    return await this.dao.getGrades();
+  }
 
 
 }

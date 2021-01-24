@@ -175,7 +175,7 @@ export const GradeStudents = () => {
           {grade_assignments}
         </Select>
       </FormControl>
-      <Button variant="contained" color="primary" disableElevation onClick={(e)=>{getAssignmentSubmission(assignment_id,grade_id)}}>Show Student Submissions</Button>
+      <Button variant="contained" color="primary" disableElevation onClick={(e)=>{getAssignmentSubmission(assignment_id,grade_id)}}>Show Student Submissions  </Button>
       {CustomizedTables(submission)}
      
     </div>

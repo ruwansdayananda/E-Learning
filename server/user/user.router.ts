@@ -166,6 +166,12 @@ export class UserRouter extends BaseRouter {
   })
   this.router.get('/get-user-subject', this.getUserSubjects.bind(this));
   this.router.get('/get-user-studyMaterial', this.getUserStudyMaterial.bind(this));
+  
+  this.router.post('/addSubject', this.addSubject.bind(this));
+    this.router.get('/getSubjects', this.getSubjects.bind(this));
+    this.router.get('/getGradeSubjects', this.getGradeSubjects.bind(this));
+    this.router.post('/addGradeSubjects', this.addGradeSubjects.bind(this));
+    this.router.get('/getGrades', this.getGrades.bind(this));
 
 
   }
@@ -250,20 +256,38 @@ export class UserRouter extends BaseRouter {
 
 
 //////////////--------End Student -------------------------
-
+async addSubject(req, res) {
+  const data = req.body;
+  await this.service.addSubject(data)
+  res.json({ msg: 'Subjects Added!', status: 'success' });
+}
+async getSubjects(req, res) {
+  return res.json(await this.service.getSubjects());
+}
+async getGrades(req, res) {
+  return res.json(await this.service.getGrades());
+}
+async addGradeSubjects(req, res) {
+  const data = req.body;
+  await this.service.addGradeSubjects(data)
+  res.json({ msg: 'Subjects Added!', status: 'success' });
+}
+async getGradeSubjects(req, res) {
+  return res.json(await this.service.getGradeSubjects());
+}
 
 
 
   async signupUser(req, res) {
-    const { name, birthday, signInAs, email, password, grade, subject, telephone } = req.body;
+    const { name, birthday, signInAs, email, password, grade_id, subject_id, telephone } = req.body;
     await this.service.saveUser({
       name,
       birthday,
       signInAs,
       email,
       password,
-      grade,
-      subject,
+      grade_id,
+      subject_id,
       telephone,
     });
     res.json({ msg: 'Sign Up Success!', status: 'success' });
