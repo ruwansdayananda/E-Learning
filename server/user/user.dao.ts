@@ -245,6 +245,35 @@ async listCompletedAssignments(email){
     return rows[0];
   }
 
+  async getMarksInformation(email) {
+    const rows = await this.query(
+      `
+      SELECT * FROM mark WHERE student_email=?
+    `,
+      [email],
+    );
+    return rows[0];
+  };
+
+  async getGrade(email) {
+    const rows = await this.query(
+      `
+      SELECT * FROM grade WHERE grade_id = (SELECT grade_id FROM student WHERE email=?)
+    `,
+      [email],
+    );
+    return rows[0];
+  };
+
+  async getStudentGPA(email) {
+    const rows = await this.query(
+      `
+      SELECT * FROM student_performance WHERE student_email=?
+    `,
+      [email],
+    );
+    return rows[0];
+  };
 
   async getTeacherSubject(email) {
     const rows = await this.query(
@@ -259,17 +288,30 @@ async listCompletedAssignments(email){
     return rows[0];
   }
 
-  async getAvailableGrades() {
-    const rows = await this.query(
-      `
-      SELECT * from eLearning.grade
+  // async getAvailableGrades() {
+  //   const rows = await this.query(
+  //     `
+  //     SELECT * from eLearning.grade
     
-    `
+  //   `);
 
+  //   return rows;
+  // }
+
+
+
+async getTeacherAssignmets(email) {
+  const rows = await this.query(
+    `
+    SELECT * from eLearning.assignment WHERE user_email=? ORDER BY upload_date desc
+  
+  `,
+    [email],
     );
 
     return rows;
   }
+
 
 
 
@@ -359,6 +401,64 @@ async listCompletedAssignments(email){
           data.title,
       ],
     );
+  }
+
+
+  async getAvailableGrades() {
+    const rows = await this.query(
+      `
+      SELECT * from eLearning.grade
+    
+    `
+
+    );
+
+    return rows;
+  }
+
+  async getAssignmentID(upload_id){
+    const rows = await this.query(
+      `
+      select assignment_id from eLearning.submission where (upload_id = ?);
+      `,
+      [upload_id]
+    )
+    return rows[0];
+  }
+  
+  async getSubjectID(assignment_id){
+    const rows = await this.query(
+      `select subject_id from eLearning.assignment where (assignment_id = ?);
+      `
+      ,[assignment_id]
+    );
+    return rows[0];
+  }
+
+  async writeToMarksTable(student_email,teacher_email,assignment_id,subject_id,marks,comment){
+    const rows = await this.query(
+      `
+      INSERT INTO eLearning.mark (student_email,teacher_email,assignment_id,subject_id,marks,comment)
+      VALUES (?,?,?,?,?,?)
+      `
+      ,[student_email,teacher_email,assignment_id,subject_id,marks,comment]
+    )
+  }
+
+  async getSubmissionForAssignement(assignment_id) {
+    const rows = await this.query(
+      `
+    SELECT u.name,s.email,s.upload_id FROM submission s INNER JOIN user u ON s.email=u.email WHERE s.assignment_id=?;
+    `,
+      [assignment_id],
+    );
+
+    for(var i=0;i<rows.length;i++){
+        rows[i].grade="";
+        rows[i].comment="";
+       }
+
+    return rows;
   }
 
 }
