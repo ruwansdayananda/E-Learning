@@ -21,8 +21,8 @@ export class DatabaseConnection extends BaseModule {
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'Rashmi6@',
-      database: 'learning',
+      password: 'root',
+      database: 'eLearning',
       entities: [`${__dirname}/../**/*.entity.ts`],
       logging: false,
     });

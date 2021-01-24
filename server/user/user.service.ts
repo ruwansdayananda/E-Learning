@@ -33,5 +33,19 @@ export class UserService extends BaseModule {
     return await this.dao.getStudentGPA(email);
   }
 
+  async getAssignmentID(upload_id){
+    return await this.dao.getAssignmentID(upload_id);
+  }
+
+  async getSubjectID(assignment_id){
+    return await this.dao.getSubjectID(assignment_id);
+  }
+  async writeToMarksTable(student_email,teacher_email,assignment_id,subject_id,marks,comment){
+    return await this.dao.writeToMarksTable(student_email,teacher_email,assignment_id,subject_id,marks,comment);
+  }
+
+  async getSubmissionForAssignement(data) {
+    return await this.dao.getSubmissionForAssignement(data);
+  }
 
 }

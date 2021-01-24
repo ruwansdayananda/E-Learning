@@ -74,6 +74,16 @@ export class UserRouter extends BaseRouter {
     this.router.get('/get-marks-information', this.getMarksInformation.bind(this));
     this.router.get('/get-grade-information', this.getGrade.bind(this));
     this.router.get('/get-gpa-information', this.getStudentGPA.bind(this));
+    this.router.post('/submitGrading',this.submitGrading.bind(this));
+    this.router.get('/getFile2/:upload_id', (req: any, res) => {
+      const upload_id = req.params['upload_id'];
+      this.getFile2.bind(this)({...req,upload_id},res);
+    });
+    this.router.post('/getAssignmentSubmission', (req: any, res) => {
+      const f = req.body.assignment_id
+     //res.json(this.getSubmissionForAssignement(f,res));
+     this.getSubmissionForAssignement(f,res)
+    });
   }
 
   async signupUser(req, res) {
@@ -125,6 +135,35 @@ export class UserRouter extends BaseRouter {
     const fileName = await this.service.getFileName(req.upload_id);
     const location = `${__dirname}/../uploads/${req.upload_id}`;
     return res.download(location, fileName.file_name);
+  }
+
+
+  async submitGrading(req,res){
+    let student_email = req.body.email;
+    let teacher_email = req.session.passport.user;
+    console.log(req.body.upload_id);
+    let assignment_id =await JSON.parse(JSON.stringify(await this.service.getAssignmentID(req.body.upload_id))).assignment_id;
+    console.log(assignment_id);
+    let subject_id = await JSON.parse(JSON.stringify(await this.service.getSubjectID(assignment_id))).subject_id;
+    console.log(subject_id);
+    let marks = req.body.grade;
+    let comment = req.body.comment;
+    return res.json(await this.service.writeToMarksTable(student_email,teacher_email,assignment_id,subject_id,marks,comment));
+    
+  }
+
+  async getFile2(req, res) {
+    const fileName = await this.service.getFileName(req.upload_id);
+    const file = JSON.parse(JSON.stringify(fileName)).file_name;
+    console.log(file);
+    const location = `${__dirname}/../uploads/${file}`;
+    console.log(location);
+    res.download(location);
+  }
+
+  async getSubmissionForAssignement(req, res) {
+
+    return res.json(await this.service.getSubmissionForAssignement(req));
   }
 
 
