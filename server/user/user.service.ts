@@ -8,9 +8,6 @@ export class UserService extends BaseModule {
   async saveUser(data) {
     return await this.dao.saveUser(data);
   }
-  async saveAssignment(data) {
-    return await this.dao.saveAssignment(data);
-  }
   async saveFileInfo(data) {
     return await this.dao.saveFileInfo(data);
   }
@@ -26,48 +23,15 @@ export class UserService extends BaseModule {
   async getUserInformation(email) {
     return await this.dao.getUserInformation(email);
   }
-
-  async listAssignments(email,grade){
-    return await this.dao.listAssignments(email,grade);
+  async getMarksInformation(email) {
+    return await this.dao.getMarksInformation(email);
+  }
+  async getGrade(email) {
+    return await this.dao.getGrade(email);
+  }
+  async getStudentGPA(email) {
+    return await this.dao.getStudentGPA(email);
   }
 
-  async getStudentInformation(email){
-    return await this.dao.getStudentInformation(email);
-  }
 
-  async getFileLocation(upload_id){
-    return await this.dao.getFileLocation(upload_id);
-  }
-
-  async listCompletedAssignments(email){
-    return await this.dao.listCompletedAssignments(email);
-  }
-
-  async writeToUploadsTable(upload_id,filename,file_size,fileExtension,mimetype){
-    return await this.dao.writeToUploadsTable(upload_id,filename,file_size,fileExtension,mimetype);
-  }
-  
-  async writeToSubmissionTable(updated_upload_id,assignment_id,email){
-    return await this.dao.writeToSubmissionTable(updated_upload_id,assignment_id,email);
-  }
-
-  async getLastUploadID(){
-    return await this.dao.getLastUploadID();
-  }
-
-  async getTeacherSubject(email) {
-    return await this.dao.getTeacherSubject(email);
-  }
-  async getAvailableGrades() {
-    return await this.dao.getAvailableGrades();
-  }
-  async getUserSubjects(email) {
-    return await this.dao.getUserSubjects(email);
-  }
-  async getUserStudyMaterial(email) {
-    return await this.dao.getUserStudyMaterial(email);
-  }
-  async saveStudyMatInfo(data) {
-    return await this.dao.saveStudyMatInfo(data);
-  }
 }
