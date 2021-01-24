@@ -790,7 +790,7 @@ const DownloadAssignment=async (upload_id)=>{
   //   const file_name = res.file_name;
 
   
-    openInNewTab("http://localhost:8000/api/user/getFile/"+upload_id);
+    openInNewTab("http://localhost:8000/api/user/getFile2/"+upload_id);
 
 }
 

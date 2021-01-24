@@ -16,7 +16,7 @@ const stripe = new Stripe(
   },
 );
 import fs from 'fs';
-import shell from 'shelljs';
+//import shell from 'shelljs';
 function getExtension(filename) {
   const i = filename.lastIndexOf('.');
   return i < 0 ? '' : filename.substr(i);
@@ -27,7 +27,7 @@ export class UserRouter extends BaseRouter {
     console.log("user.router.js");
     this.router.get('/getFile/:upload_id', (req: any, res) => {
       const upload_id = req.params['upload_id'];
-      this.getFile.bind(this)({...req,upload_id},res)
+      this.getFile.bind(this)({...req,upload_id},res);
     });
     this.router.get('/getFileInfo/', (req: any, res) => {
       const type = req.query.type;
@@ -57,6 +57,41 @@ export class UserRouter extends BaseRouter {
         res.json({ filePath: `public/uploads/${file.name}`, status: 'success' });
       });
     });*/
+
+    this.router.post('/studyMaterialUpload', (req: any, res) => {
+      const fileName = uuidv4();
+     // console.log(fileName);
+      if (req.files === null) {
+        return res.status(400).json({ msg: 'No file uploaded' });
+      }
+
+     const directoryLocation = `${__dirname}/../../server/uploads/`;
+      const location = `./uploads/${fileName}`;
+
+      if (!fs.existsSync(directoryLocation)){
+        fs.mkdirSync(directoryLocation);
+      }
+      const filesUploaded = req.files.file;
+        filesUploaded.mv(location, (err) => {
+        if (err) {
+          return res.status(500).send(err);
+        }
+        else{ res.send("success");}
+      });
+      
+      const title=req.body.title;
+      const teacher_email=req.body.teacher_email;
+      const subject=req.body.subject;
+      const grade=req.body.grade;
+      const description=req.body.description;
+      const filenamea = filesUploaded.name;
+      const filesize = filesUploaded.size;
+      const filemime = filesUploaded.mimetype;
+      // this.saveFileInfo({req,fileName}, res);
+      //res.send(filemime);
+      this.savestudyMaterialInfo({teacher_email,subject,grade,description,title,filenamea,filesize,filemime,fileName}, res);
+    });
+
     this.router.post('/signup', this.signupUser.bind(this));
     this.router.post(
       '/login',
@@ -89,6 +124,10 @@ export class UserRouter extends BaseRouter {
     this.router.post('/filelocation',this.getFileLocation.bind(this));
 
     this.router.post('/upload-file',this.uploadSubmission.bind(this));
+    this.router.get('/getFile2/:upload_id', (req: any, res) => {
+      const upload_id = req.params['upload_id'];
+      this.getFile2.bind(this)({...req,upload_id},res);
+    });
 
     this.router.get('/get-teacher-subjects', this.getTeacherSubject.bind(this));
 
@@ -116,6 +155,8 @@ export class UserRouter extends BaseRouter {
   
   
   })
+  this.router.get('/get-user-subject', this.getUserSubjects.bind(this));
+  this.router.get('/get-user-studyMaterial', this.getUserStudyMaterial.bind(this));
 
 
   }
@@ -226,6 +267,14 @@ export class UserRouter extends BaseRouter {
     await this.service.saveFileInfo(data);
   }
 
+  async savestudyMaterialInfo(req, res) {
+    const upload_id = req.fileName;
+    const data = {upload_id: upload_id, file_name: req.filenamea, file_size: `${req.filesize}KB`, file_type: getExtension(req.filenamea), upload_date:new Date().toISOString().substring(0, 10), mimetype: req.filemime};
+    const studyData = {...req,upload_id};
+    await this.service.saveFileInfo(data);
+    await this.service.saveStudyMatInfo(studyData);
+  }
+
   async checkAuthenticated(req, res) {
     if (req.isAuthenticated()) {
       return res.json({ session: true });
@@ -252,15 +301,15 @@ export class UserRouter extends BaseRouter {
     console.log(data.user);
     return res.json(await this.service.getFileInfo(data));
   }
-  // async getFile(req, res) {
-  //   const fileName = await this.service.getFileName(req.upload_id);
-  //   const location = `${__dirname}/../uploads/${req.upload_id}`;
-  //   return res.download(location, fileName.file_name);
-  // }
+  async getFile(req, res) {
+    const fileName = await this.service.getFileName(req.upload_id);
+    const location = `${__dirname}/../uploads/${req.upload_id}`;
+    return res.download(location, fileName.file_name);
+  }
 
   //Wimukthi's
 
-  async getFile(req, res) {
+  async getFile2(req, res) {
     const fileName = await this.service.getFileName(req.upload_id);
     const file = JSON.parse(JSON.stringify(fileName)).file_name;
     console.log(file);
@@ -268,5 +317,11 @@ export class UserRouter extends BaseRouter {
     console.log(location);
     res.download(location);
   }
-  
+  async getUserSubjects(req, res) {
+    return res.json(await this.service.getUserSubjects(req.session.passport.user));
+  }
+  async getUserStudyMaterial(req, res) {
+    return res.json(await this.service.getUserStudyMaterial(req.session.passport.user));
+  }
+//  
 }

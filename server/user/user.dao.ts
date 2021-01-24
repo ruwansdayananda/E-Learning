@@ -273,4 +273,92 @@ async listCompletedAssignments(email){
 
 
 
+  async getUserSubjects(email) {
+    const rows = await this.query(
+      `
+   SELECT * FROM eLearning.user WHERE email=?
+    `,
+      [email],
+    );
+
+    const usertype = rows[0].type;
+    let subjects=[];
+    if(usertype=="student"){
+      subjects = await this.query(
+      `
+      SELECT subject_id,subject FROM grade_subject INNER JOIN subject USING(subject_id) WHERE grade_id = (SELECT grade_id FROM student WHERE email=?)
+    `,
+      [email],
+    );
+     const grade = await this.query(
+      `SELECT grade_id,grade FROM student INNER JOIN grade USING(grade_id) WHERE student.email=?`,
+      [email],
+     ) ;  
+     subjects.push(grade[0]);
+    
+    }
+    else if(usertype=="teacher"){
+      const subjectTeacher = await this.query(
+      `
+      SELECT subject_id,subject FROM teacher INNER JOIN subject USING(subject_id) WHERE teacher.email=?
+    `,
+      [email],
+    );
+    subjects = await this.query(
+      `
+      SELECT grade_id,grade FROM grade;
+    `
+    );
+      subjects.push(subjectTeacher);
+    }
+    return subjects;
+  }
+
+  async getUserStudyMaterial(email) {
+    const rows = await this.query(
+      `
+   SELECT * FROM eLearning.user WHERE email=?
+    `,
+      [email],
+    );
+
+    const usertype = rows[0].type;
+    let study=[];
+    if(usertype=="student"){
+      study = await this.query(
+      `
+       SELECT sm.titile,s.subject,s.subject_id ,u.name,sm.description,upload_id,upload_date FROM ((study_material sm INNER JOIN user u ON sm.teacher_email=u.email) INNER JOIN subject s USING(subject_id)) INNER JOIN upload USING(upload_id) WHERE grade_id=(SELECT grade_id FROM student WHERE email=?) ORDER BY study_material_id DESC;
+    `,
+      [email],
+    );
+    
+    }
+    else if(usertype=="teacher"){
+      study = await this.query(
+      `
+      SELECT upload_id,subject,grade,description,titile,upload_date FROM study_material INNER JOIN subject USING(subject_id) INNER JOIN grade USING(grade_id) INNER JOIN upload using(upload_id) WHERE teacher_email=? ORDER BY study_material_id DESC;
+    `,
+      [email],
+    );
+    }
+    return study;
+  }
+
+  async saveStudyMatInfo(data) {
+    return await this.query(
+      `
+        INSERT INTO study_material (upload_id, teacher_email, subject_id, grade_id, description, titile)
+        VALUES (?, ?, ?, ?, ?,?)
+    `,
+      [
+          data.upload_id,
+          data.teacher_email,
+          data.subject,
+          data.grade,
+          data.description,
+          data.title,
+      ],
+    );
+  }
+
 }
