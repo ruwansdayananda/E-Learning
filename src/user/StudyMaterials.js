@@ -1,3 +1,30 @@
+// import Paper from "@material-ui/core/Paper";
+// import React from "react";
+// import Typography from "@material-ui/core/Typography";
+// import upload from "../images/upload.png";
+// import { UploadFileButton } from "./UploadFileButton";
+// import { makeStyles } from "@material-ui/core";
+// import { useFetch } from "../core/fetch";
+// import { Link } from "react-router-dom";
+
+// const useStyles = makeStyles((theme) => ({}));
+
+// export const StudyMaterials = () => {
+//   // const classes = useStyles();
+//   // const type = 'assignment';
+//   // const userType = 'student';
+//   // const data = useFetch({ url: `/api/user/getFileInfo/?type=${type}&userType=${userType}&other=''` });
+//   return (
+//     <div></div>
+//     // <div style={{marginTop: '100px'}}>
+//     //      <UploadFileButton type="assignments" userType='student' subject='Science' grade='Grade 5' userEmail='180424d@uom.lk'/>
+//     //      data.map((item,index)){
+//     //          <a href={`http://localhost:8000/api/user/getFile/${item.upload_id}`}>Download</a>
+//     //     }
+//     // </div>
+//   );
+// };
+
 //Import necessory components and libraries
 import Paper from "@material-ui/core/Paper";
 import React, { useState, useEffect } from "react";
@@ -14,6 +41,7 @@ import * as Yup from "yup";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import NativeSelect from "@material-ui/core/NativeSelect";
+import { Grades } from "./Grades";
 
 //define styling object component
 const useStyles = makeStyles((theme) => ({
@@ -94,6 +122,7 @@ export const StudyMaterials = () => {
     grade: Yup.string().required("Required"),
     description: Yup.string().min(10, "Too Short!").required("Required"),
   });
+
   //fetch user data from database at begining
   const userInformation = useFetch({ url: "/api/user/get-user-information" });
   const currentUserType = userInformation.type;
@@ -103,16 +132,27 @@ export const StudyMaterials = () => {
   console.log(userSpecificContents);
   console.log(userSpecificAttribute);
 
-   const changeSubject = (event) => {
-     setUsersubjects(event.target.value);
-   };
+  const getStudyMaterial = useFetch({
+    url: "/api/user/get-user-studyMaterial",
+  });
+  console.log(getStudyMaterial);
+  // const data = useFetch({
+  //   url: `/api/user/getFileInfo/?type=study&userType=${currentUserType}&other=''`,
+  // });xxxxxx
+  // console.log(getStudyMaterial[0].grade_id);
+  // const gradessss = userSubjectGrade.filter(
+  //   (grades) => grades.grade_id == getStudyMaterial[0].grade_id
+  // );
+  console.log(getStudyMaterial);
 
-   useEffect(() => {
-     //console.log(usersubjects);
-   }, [usersubjects]);
+  const changeSubject = (event) => {
+    setUsersubjects(event.target.value);
+  };
 
+  useEffect(() => {
+    //console.log(usersubjects);
+  }, [usersubjects]);
 
-  
   const onChangeHandler = (event) => {
     if (event.target.files.length > 0) {
       if (files.length === 0) {
@@ -133,7 +173,6 @@ export const StudyMaterials = () => {
     document.getElementById("upload-file").value = "";
   };
 
- 
   //check current user equal teacher and render relevent component
   if (currentUserType === "teacher") {
     return (
@@ -158,26 +197,32 @@ export const StudyMaterials = () => {
               subject: "",
               grade: "",
               description: "",
+              title: "",
             }}
             onSubmit={async (data) => {
-              console.log(userInformation);
               const formData = new FormData();
+              formData.append("title", data.title);
               formData.append("subject", data.subject);
               formData.append("grade", data.grade);
               formData.append("description", data.description);
               formData.append("fileAmount", files.length);
+              formData.append("teacher_email", userInformation.email);
 
-              for (const file of files) {
-                formData.append("file", file);
-              }
+              // for (const file of files) {
+              //   formData.append("file", file);
+              //   //console.log(file);
+              // }
+              formData.append("file", files[0]);
               const res = await fetch({
-                url: "/api/user/studyMat",
+                url: "/api/user/studyMaterialUpload",
                 method: "post",
                 body: formData,
               });
-              console.log(res);
               if (res === "success") {
-                alert("success");
+                alert(
+                  "You have successfully added Study Material. Go to page Bottum"
+                );
+                window.location.reload(false);
               } else if (res === "error") {
                 setShowAlert(true);
                 setTimeout(() => {
@@ -186,6 +231,15 @@ export const StudyMaterials = () => {
               }
             }}
           >
+            <FormInput
+              type="text"
+              label="Title"
+              name="title"
+              variant="filled"
+              rows="1"
+              className={classes.desc}
+            />
+            <br />
             <FormSelect
               name="subject"
               label="Select Subbject"
@@ -216,8 +270,6 @@ export const StudyMaterials = () => {
                   </MenuItem>
                 );
               })}
-
-             
             </FormSelect>
             <br />
 
@@ -281,10 +333,96 @@ export const StudyMaterials = () => {
             </Button>
           </Form>
         </Grid>
+        <br />
+        <br />
+        <hr className={classes.hr} />
+        <hr className={classes.hr} />
+        <Grid className={classes.grid1}>
+          <label
+            style={{
+              fontWeight: "bolder",
+              color: "#080A74",
+              fontSize: "25px",
+              paddingRight: "10px",
+            }}
+          >
+            Uploaded Study Materials
+          </label>
+        </Grid>
+        <hr className={classes.hr} />
+        <hr className={classes.hr} />
+        <br />
+        <br />
+        <br />
+        <Grid className={classes.grid2}>
+          {getStudyMaterial.map((studyMap, index) => {
+            return (
+              <div>
+                <label
+                  htmlFor=""
+                  style={{ fontWeight: "bolder", color: "Blue" }}
+                >
+                  {index + 1}) Title : {studyMap.titile}
+                </label>
+                <a
+                  style={{
+                    fontWeight: "bolder",
+                    color: "red",
+                    paddingLeft: "20px",
+                    textDecoration: "underline",
+                  }}
+                  href={`http://localhost:8000/api/user/getFile/${studyMap.upload_id}`}
+                >
+                  Download From Here
+                </a>
+                <br />
+                <label
+                  htmlFor=""
+                  style={{ fontWeight: "bolder", paddingLeft: "20px" }}
+                >
+                  Subject : {studyMap.subject}
+                </label>
+                <br />
+                <label
+                  htmlFor=""
+                  style={{ fontWeight: "bolder", paddingLeft: "20px" }}
+                >
+                  Grade : {studyMap.grade}
+                </label>
+                <br />
+                <label
+                  htmlFor=""
+                  style={{
+                    fontWeight: "bolder",
+                    paddingLeft: "20px",
+                    maxWidth: "500px",
+                  }}
+                >
+                  Description :
+                  <div style={{ paddingLeft: "20px" }}>
+                    {studyMap.description}
+                  </div>
+                </label>
+                <label
+                  htmlFor=""
+                  style={{
+                    fontWeight: "bolder",
+                    paddingLeft: "20px",
+                  }}
+                >
+                  Uploaded Date : {studyMap.upload_date}
+                </label>
+                <br />
+                <br />
+              </div>
+            );
+          })}
+        </Grid>
       </div>
     );
-  } 
-  
+  }
+   
+
   //check user equal to student and render relevent page to student
   else if (currentUserType === "student") {
     return (
@@ -343,12 +481,77 @@ export const StudyMaterials = () => {
             You are in : {userSpecificAttribute.grade}
           </label>
           <br />
-          {/* </Form> */}
           <br />
           <br />
         </Grid>
         <hr className={classes.hr} style={{ width: "100%" }} />
         <hr className={classes.hr} style={{ width: "100%" }} />
+        <br />
+        <br />
+        <Grid className={classes.grid2}>
+          {getStudyMaterial.map((studyMap, index) => {
+            if (studyMap.subject_id == usersubjects) {
+              return (
+                <div>
+                  <label
+                    htmlFor=""
+                    style={{ fontWeight: "bolder", color: "Blue" }}
+                  >
+                    {index + 1}) Title : {studyMap.titile}
+                  </label>
+                  <a
+                    style={{
+                      fontWeight: "bolder",
+                      color: "red",
+                      paddingLeft: "20px",
+                      textDecoration: "underline",
+                    }}
+                    href={`http://localhost:8000/api/user/getFile/${studyMap.upload_id}`}
+                  >
+                    Download From Here
+                  </a>
+                  <br />
+                  <label
+                    htmlFor=""
+                    style={{ fontWeight: "bolder", paddingLeft: "20px" }}
+                  >
+                    Subject : {studyMap.subject}
+                  </label>
+                  <br />
+                  <label
+                    htmlFor=""
+                    style={{ fontWeight: "bolder", paddingLeft: "20px" }}
+                  >
+                    Teacher Name : {studyMap.name}
+                  </label>
+                  <br />
+                  <label
+                    htmlFor=""
+                    style={{ fontWeight: "bolder", paddingLeft: "20px" }}
+                  >
+                    Description :
+                    <div style={{ paddingLeft: "20px" }}>
+                      {studyMap.description}
+                    </div>
+                  </label>
+                  <br />
+                  <label
+                    htmlFor=""
+                    style={{
+                      fontWeight: "bolder",
+                      paddingLeft: "20px",
+                      maxWidth: "100px",
+                    }}
+                  >
+                    Uploaded Date : {studyMap.upload_date}
+                  </label>
+                  <br />
+                  <br />
+                </div>
+              );
+            }
+          })}
+        </Grid>
       </div>
     );
   }

@@ -11,14 +11,25 @@ export class UserService extends BaseModule {
   async saveFileInfo(data) {
     return await this.dao.saveFileInfo(data);
   }
+  async getFileInfo(data) {
+    return await this.dao.getFileInfo(data);
+  }
+  async getFileName(upload_id) {
+    return await this.dao.getFileName(upload_id);
+  }
   async getUser(email) {
     return await this.dao.getUser(email);
   }
-
   async getUserInformation(email) {
     return await this.dao.getUserInformation(email);
   }
   async getUserSubjects(email) {
     return await this.dao.getUserSubjects(email);
+  }
+  async getUserStudyMaterial(email) {
+    return await this.dao.getUserStudyMaterial(email);
+  }
+  async saveStudyMatInfo(data) {
+    return await this.dao.saveStudyMatInfo(data);
   }
 }
