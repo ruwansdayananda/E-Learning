@@ -183,7 +183,43 @@ export class UserDao extends BaseDao {
     return rows[0];
   };
 
+  async getTeacherSubject(email) {
+    const rows = await this.query(
+      `
+      SELECT * from eLearning.teacher natural join eLearning.subject WHERE email=?
+    
+    `,
+      [email],
 
+    );
+
+    return rows[0];
+  }
+
+  async getTeacherAssignmets(email) {
+    const rows = await this.query(
+      `
+      SELECT * from eLearning.assignment WHERE user_email=? ORDER BY upload_date desc
+    
+    `,
+      [email],
+
+    );
+
+    return rows;
+  }
+
+  async getAvailableGrades() {
+    const rows = await this.query(
+      `
+      SELECT * from eLearning.grade
+    
+    `
+
+    );
+
+    return rows;
+  }
 
 
   

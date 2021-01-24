@@ -74,6 +74,11 @@ export class UserRouter extends BaseRouter {
     this.router.get('/get-marks-information', this.getMarksInformation.bind(this));
     this.router.get('/get-grade-information', this.getGrade.bind(this));
     this.router.get('/get-gpa-information', this.getStudentGPA.bind(this));
+    this.router.get('/get-teacher-subjects', this.getTeacherSubject.bind(this));
+
+    this.router.get('/get-available-grades', this.getAvailableGrades.bind(this));
+
+    this.router.get('/get-teacher-assignmets', this.getTeacherAssignmets.bind(this));
   }
 
   async signupUser(req, res) {
@@ -125,6 +130,19 @@ export class UserRouter extends BaseRouter {
     const fileName = await this.service.getFileName(req.upload_id);
     const location = `${__dirname}/../uploads/${req.upload_id}`;
     return res.download(location, fileName.file_name);
+  }
+
+  async getTeacherSubject(req, res) {
+  
+    return res.json(await this.service.getTeacherSubject(req.session.passport.user));
+  }
+
+  async getTeacherAssignmets(req, res){
+    return res.json(await this.service.getTeacherAssignmets(req.session.passport.user))
+  }
+
+  async getAvailableGrades(req, res){
+    return res.json(await this.service.getAvailableGrades());
   }
 
 

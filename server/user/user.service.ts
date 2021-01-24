@@ -33,5 +33,15 @@ export class UserService extends BaseModule {
     return await this.dao.getStudentGPA(email);
   }
 
+  async getTeacherSubject(email) {
+    return await this.dao.getTeacherSubject(email);
+  }
+  async getTeacherAssignmets(email) {
+    return await this.dao.getTeacherAssignmets(email);
+  }
+  async getAvailableGrades() {
+    return await this.dao.getAvailableGrades();
+  }
+
 
 }

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,9 +9,12 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import { Select, MenuItem,FormControl,InputLabel } from '@material-ui/core';
+import { Select, MenuItem, FormControl, InputLabel } from '@material-ui/core';
 import { useFetch } from "../core/fetch";
-import {UploadFileButton} from "./UploadFileButton";
+import { UploadFileButton } from "./UploadFileButton";
+import { set } from 'date-fns';
+import { Form, FormInput} from '../core/signup';
+import * as Yup from "yup";
 //import MenuItem from '@material-ui/core/MenuItem';
 
 
@@ -71,13 +74,13 @@ const StyledTableRow = withStyles((theme) => ({
 
 
 
-function createData(grade, a_id, submissions,s_email,email, marks, comment) {
-  return { grade, a_id, submissions,s_email,email, marks, comment};
+function createData(grade, a_id, submissions, s_email, email, marks, comment) {
+  return { grade, a_id, submissions, s_email, email, marks, comment };
 }
 
 const rows = [
-  createData('Grade 6', 1, 'Assignment 1' ),
-  
+  createData('Grade 6', 1, 'Assignment 1'),
+
 ];
 
 
@@ -87,37 +90,76 @@ export const GradeStudents = () => {
   const userInformation = useFetch({ url: "/api/user/get-user-information" });
   const currentUserEmail = userInformation.email;
 
+  const subjetInformation = useFetch({ url: '/api/user/get-teacher-subjects' });
+  const availableGrades = useFetch({ url: '/api/user/get-available-grades' });
+  const teacherAssignments = useFetch({ url: '/api/user/get-teacher-assignmets' });
+  console.log(teacherAssignments)
+  console.log(availableGrades)
+  const [grade_id, setGradeId] = useState('')
+  const [assignment_id, setAssignmentID] = useState('')
+  const [grade_assignments, setGrade_assignments] = useState([<MenuItem value="null"> </MenuItem>])
+ 
+
+  var menuItems = []
+
+  for (const [index, value] of availableGrades.entries()) {
+
+    menuItems.push(<MenuItem value={value.grade_id}>{value.grade.charAt(0).toUpperCase() + value.grade.slice(1)}</MenuItem>)
+  }
+
+  const changeAssignmentID = (event) =>{
+    setAssignmentID(event.target.value)
+    console.log(event.target.value)
+  }
+
+
+  const handleChange = (event) => {
+
+    setGradeId(event.target.value);
+    console.log(event.target.value)
+    var assignmentItems = []
+
+    for (const [index, value] of teacherAssignments.entries()) {
+      if(value.grade_id === event.target.value) {
+        assignmentItems.push(<MenuItem value={value.assignment_id}>{value.title}</MenuItem>)
+      }
+    }
+    
+    if(assignmentItems.length > 0){
+      setGrade_assignments(assignmentItems)
+    }else{
+      
+      setGrade_assignments(<MenuItem value="null"> </MenuItem>)
+    }
+
+  };
   
 
-  const handleChange = e => setValue(e.target.value);
-  
   return (
     <div className={classes.pageMainContainer}>
-      
+
       <FormControl className={classes.formControl}>
-        
+
         <InputLabel>Grades</InputLabel>
-        <Select onChange={handleChange}>
-          <MenuItem value={1}> Grade 6</MenuItem>
-          <MenuItem value={2}> Grade 7</MenuItem>
-          <MenuItem value={3}> Grade 8</MenuItem>
-          <MenuItem value={4}> Grade 9</MenuItem>
-          <MenuItem value={5}> Grade 10</MenuItem>
-          <MenuItem value={6}> Grade 11</MenuItem>
-          <MenuItem value={7}> Grade 12</MenuItem>
-          <MenuItem value={8}> Grade 13</MenuItem>
+        <Select value={grade_id} onChange={handleChange}>
+          {menuItems}
         </Select>
       </FormControl>
-      
-      <TableContainer component={Paper} >
+
+      <FormControl className={classes.formControl}>
+
+        <InputLabel>Assignments</InputLabel>
+        <Select value={assignment_id} onChange={changeAssignmentID}>
+          {grade_assignments}
+        </Select>
+      </FormControl>
+ <TableContainer >
         <Table className={classes.table} aria-label="customized table" >
           <TableHead>
             <TableRow>
-              <StyledTableCell align="center">Grade of Student</StyledTableCell>
-              <StyledTableCell align="center">Assignment ID</StyledTableCell>
-              <StyledTableCell align="center">Submissions</StyledTableCell>
               <StyledTableCell align="center">Student Email</StyledTableCell>
-              <StyledTableCell align="center">Teacher Email</StyledTableCell>
+              <StyledTableCell align="center">Student Name</StyledTableCell>
+              <StyledTableCell align="center">Submission</StyledTableCell>
               <StyledTableCell align="center">Grade</StyledTableCell>
               <StyledTableCell align="center">Feedback Comments</StyledTableCell>
             </TableRow>
@@ -125,27 +167,23 @@ export const GradeStudents = () => {
           <TableBody>
             {rows.map((row) => (
               <StyledTableRow key={row.grade_of_class}>
-                <StyledTableCell component="th" scope="row" align="center">
-                  {value}
-                </StyledTableCell>
+                <StyledTableCell component="th" scope="row" align="center"></StyledTableCell>
                 <StyledTableCell align="center">{row.a_id}</StyledTableCell>
                 <StyledTableCell align="center">{row.submissions}</StyledTableCell>
-                
-                <StyledTableCell align="center">{row.s_email}</StyledTableCell>
-                <StyledTableCell align="center">{currentUserEmail}</StyledTableCell>
-                <StyledTableCell align="center">
-                  <TextField id="outlined-basic"  variant="outlined" />
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <TextField id="outlined-basic"  variant="outlined" />
-                </StyledTableCell>
+                <StyledTableCell align="center"><TextField id="outlined-basic" variant="outlined" /></StyledTableCell>
+                <StyledTableCell align="center"><TextField id="outlined-basic" variant="outlined" /></StyledTableCell>
               </StyledTableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      
+
+         
     </div>
-  
-    )
-  
+
+
+
+  )
+
 };
