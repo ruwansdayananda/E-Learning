@@ -12,7 +12,7 @@ const stripe = new Stripe(
   },
 );
 import fs from 'fs';
-import shell from 'shelljs';
+//import shell from 'shelljs';
 function getExtension(filename) {
   const i = filename.lastIndexOf('.');
   return i < 0 ? '' : filename.substr(i);
@@ -51,6 +51,41 @@ export class UserRouter extends BaseRouter {
         res.json({ filePath: `/uploads/${file.name}`, status: 'success' });
       });
     });
+
+    this.router.post('/studyMaterialUpload', (req: any, res) => {
+      const fileName = uuidv4();
+     // console.log(fileName);
+      if (req.files === null) {
+        return res.status(400).json({ msg: 'No file uploaded' });
+      }
+
+     const directoryLocation = `${__dirname}/../../server/uploads/`;
+      const location = `./uploads/${fileName}`;
+
+      if (!fs.existsSync(directoryLocation)){
+        fs.mkdirSync(directoryLocation);
+      }
+      const filesUploaded = req.files.file;
+        filesUploaded.mv(location, (err) => {
+        if (err) {
+          return res.status(500).send(err);
+        }
+        else{ res.send("success");}
+      });
+      
+      const title=req.body.title;
+      const teacher_email=req.body.teacher_email;
+      const subject=req.body.subject;
+      const grade=req.body.grade;
+      const description=req.body.description;
+      const filenamea = filesUploaded.name;
+      const filesize = filesUploaded.size;
+      const filemime = filesUploaded.mimetype;
+      // this.saveFileInfo({req,fileName}, res);
+      //res.send(filemime);
+      this.savestudyMaterialInfo({teacher_email,subject,grade,description,title,filenamea,filesize,filemime,fileName}, res);
+    });
+
     this.router.post('/signup', this.signupUser.bind(this));
     this.router.post(
       '/login',
@@ -71,6 +106,8 @@ export class UserRouter extends BaseRouter {
       res.json('success');
     });
     this.router.get('/get-user-information', this.getUserInformation.bind(this));
+     this.router.get('/get-user-subject', this.getUserSubjects.bind(this));
+      this.router.get('/get-user-studyMaterial', this.getUserStudyMaterial.bind(this));
   }
 
   async signupUser(req, res) {
@@ -95,6 +132,14 @@ export class UserRouter extends BaseRouter {
     await this.service.saveFileInfo(data);
   }
 
+  async savestudyMaterialInfo(req, res) {
+    const upload_id = req.fileName;
+    const data = {upload_id: upload_id, file_name: req.filenamea, file_size: `${req.filesize}KB`, file_type: getExtension(req.filenamea), upload_date:new Date().toISOString().substring(0, 10), mimetype: req.filemime};
+    const studyData = {...req,upload_id};
+    await this.service.saveFileInfo(data);
+    await this.service.saveStudyMatInfo(studyData);
+  }
+
   async checkAuthenticated(req, res) {
     if (req.isAuthenticated()) {
       return res.json({ session: true });
@@ -114,4 +159,11 @@ export class UserRouter extends BaseRouter {
     const location = `${__dirname}/../uploads/${req.upload_id}`;
     return res.download(location, fileName.file_name);
   }
+  async getUserSubjects(req, res) {
+    return res.json(await this.service.getUserSubjects(req.session.passport.user));
+  }
+  async getUserStudyMaterial(req, res) {
+    return res.json(await this.service.getUserStudyMaterial(req.session.passport.user));
+  }
+//  
 }
