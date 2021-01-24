@@ -50,6 +50,26 @@ const DateInput = (props) => {
   );
 };
 
+
+const DateInput_ = (props) => {
+  const { value, variant, error, onChange, form, ...rest } = props;
+  return (
+
+    <KeyboardDatePicker
+      value={new Date(value)}
+      format="YYYY-MM-DD"
+      variant="inline"
+      error={Boolean(error)}
+      helperText={error}
+      inputVariant={variant}
+      
+      {...rest}
+    />
+
+  );
+};
+
 export const FormDate = formikfy(DateInput, { form: true });
+export const FormDateAssignment = formikfy(DateInput_, { form: true });
 export const FormSelect = formikfy(Select);
 export const FormInput: typeof TextField = formikfy(TextField);
