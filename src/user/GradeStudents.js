@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -13,6 +13,9 @@ import { Select, MenuItem,FormControl,InputLabel, Box } from '@material-ui/core'
 import { useFetch,fetch } from "../core/fetch";
 import {UploadFileButton} from "./UploadFileButton";
 import { render } from 'react-dom';
+import { set } from 'date-fns';
+import { Form, FormInput} from '../core/signup';
+import * as Yup from "yup";
 //import MenuItem from '@material-ui/core/MenuItem';
 
 
@@ -72,13 +75,6 @@ const StyledTableRow = withStyles((theme) => ({
 
 
 
-// function createData(grade, a_id, submissions,s_email,email, marks, comment) {
-//   return { grade, a_id, submissions,s_email,email, marks, comment};
-// }
-
-
-
-
 
 export const GradeStudents = () => {
   const [submission, setSubmission] = useState([]);
@@ -106,66 +102,82 @@ export const GradeStudents = () => {
   //  useEffect()
   
 
+
+  const subjetInformation = useFetch({ url: '/api/user/get-teacher-subjects' });
+  const availableGrades = useFetch({ url: '/api/user/get-available-grades' });
+  const teacherAssignments = useFetch({ url: '/api/user/get-teacher-assignmets' });
+  console.log(teacherAssignments)
+  console.log(availableGrades)
+  const [grade_id, setGradeId] = useState('')
+  const [assignment_id, setAssignmentID] = useState('')
+  const [grade_assignments, setGrade_assignments] = useState([<MenuItem value="null"> </MenuItem>])
+ 
+
+  var menuItems = []
+
+  for (const [index, value] of availableGrades.entries()) {
+
+    menuItems.push(<MenuItem value={value.grade_id}>{value.grade.charAt(0).toUpperCase() + value.grade.slice(1)}</MenuItem>)
+  }
+
+  const changeAssignmentID =async (event) =>{
+    setAssignmentID(event.target.value)
+    const assignment_id=event.target.value;
+    const res = await fetch({
+      url: "/api/user/getAssignmentSubmission",
+      method: "post",
+      body: assignment_id,
+      });
+      console.log(res);
+      setSubmission(res);
+    console.log(event.target.value)
+  }
+
+
+  const handleChange = (event) => {
+
+    setGradeId(event.target.value);
+    console.log(event.target.value)
+    var assignmentItems = []
+
+    for (const [index, value] of teacherAssignments.entries()) {
+      if(value.grade_id === event.target.value) {
+        assignmentItems.push(<MenuItem value={value.assignment_id}>{value.title}</MenuItem>)
+      }
+    }
+    
+    if(assignmentItems.length > 0){
+      setGrade_assignments(assignmentItems)
+    }else{
+      
+      setGrade_assignments(<MenuItem value="null"> </MenuItem>)
+    }
+
+  };
   
+
   return (
     <div className={classes.pageMainContainer}>
-      <Button onClick={(e)=>{getAssignmentSubmission("479d96f9-9f3a-4b06-b97a-69b368914746","4")}}>Hello</Button>
 
+      
+      <FormControl className={classes.formControl}>
 
-
-
-
-      {CustomizedTables(submission)}
-      {/* <FormControl className={classes.formControl}>
-        
         <InputLabel>Grades</InputLabel>
-        <Select onChange={handleChange}>
-          <MenuItem value={1}> Grade 6</MenuItem>
-          <MenuItem value={2}> Grade 7</MenuItem>
-          <MenuItem value={3}> Grade 8</MenuItem>
-          <MenuItem value={4}> Grade 9</MenuItem>
-          <MenuItem value={5}> Grade 10</MenuItem>
-          <MenuItem value={6}> Grade 11</MenuItem>
-          <MenuItem value={7}> Grade 12</MenuItem>
-          <MenuItem value={8}> Grade 13</MenuItem>
+        <Select value={grade_id} onChange={handleChange}>
+          {menuItems}
         </Select>
       </FormControl>
-      
-      <TableContainer component={Paper} >
-        <Table className={classes.table} aria-label="customized table" >
-          <TableHead>
-            <TableRow>
-              <StyledTableCell align="center">Grade of Student</StyledTableCell>
-              <StyledTableCell align="center">Assignment ID</StyledTableCell>
-              <StyledTableCell align="center">Submissions</StyledTableCell>
-              <StyledTableCell align="center">Student Email</StyledTableCell>
-              <StyledTableCell align="center">Teacher Email</StyledTableCell>
-              <StyledTableCell align="center">Grade</StyledTableCell>
-              <StyledTableCell align="center">Feedback Comments</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <StyledTableRow key={row.grade_of_class}>
-                <StyledTableCell component="th" scope="row" align="center">
-                  {value}
-                </StyledTableCell>
-                <StyledTableCell align="center">{row.a_id}</StyledTableCell>
-                <StyledTableCell align="center">{row.submissions}</StyledTableCell>
-                
-                <StyledTableCell align="center">{row.s_email}</StyledTableCell>
-                <StyledTableCell align="center">{currentUserEmail}</StyledTableCell>
-                <StyledTableCell align="center">
-                  <TextField id="outlined-basic"  variant="outlined" />
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <TextField id="outlined-basic"  variant="outlined" />
-                </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer> */}
+
+      <FormControl className={classes.formControl}>
+
+        <InputLabel>Assignments</InputLabel>
+        <Select value={assignment_id} onChange={changeAssignmentID}>
+          {grade_assignments}
+        </Select>
+      </FormControl>
+      <Button variant="contained" color="primary" disableElevation onClick={(e)=>{getAssignmentSubmission(assignment_id,grade_id)}}>Show Student Submissions</Button>
+      {CustomizedTables(submission)}
+     
     </div>
   
     )
@@ -267,3 +279,14 @@ const CustomizedTables = (submission) => {
 
 
 }
+
+      
+
+         
+ 
+
+
+
+
+
+
