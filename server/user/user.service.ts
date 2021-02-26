@@ -55,12 +55,12 @@ export class UserService extends BaseModule {
     return await this.dao.getLastUploadID();
   }
 
-  async getTeacherSubject(email) {
-    return await this.dao.getTeacherSubject(email);
-  }
-  async getAvailableGrades() {
-    return await this.dao.getAvailableGrades();
-  }
+  // async getTeacherSubject(email) {
+  //   return await this.dao.getTeacherSubject(email);
+  // }
+  // async getAvailableGrades() {
+  //   return await this.dao.getAvailableGrades();
+  // }
   async getUserSubjects(email) {
     return await this.dao.getUserSubjects(email);
   }
@@ -70,4 +70,55 @@ export class UserService extends BaseModule {
   async saveStudyMatInfo(data) {
     return await this.dao.saveStudyMatInfo(data);
   }
+  async getMarksInformation(email) {
+    return await this.dao.getMarksInformation(email);
+  }
+  async getGrade(email) {
+    return await this.dao.getGrade(email);
+  }
+  async getStudentGPA(email) {
+    return await this.dao.getStudentGPA(email);
+  }
+
+  async getAssignmentID(upload_id){
+    return await this.dao.getAssignmentID(upload_id);
+  }
+
+  async getSubjectID(assignment_id){
+    return await this.dao.getSubjectID(assignment_id);
+  }
+  async writeToMarksTable(student_email,teacher_email,assignment_id,subject_id,marks,comment){
+    return await this.dao.writeToMarksTable(student_email,teacher_email,assignment_id,subject_id,marks,comment);
+  }
+
+  async getSubmissionForAssignement(data) {
+    return await this.dao.getSubmissionForAssignement(data);
+  }
+  async getTeacherSubject(email) {
+    return await this.dao.getTeacherSubject(email);
+  }
+  async getTeacherAssignmets(email) {
+    return await this.dao.getTeacherAssignmets(email);
+  }
+  async getAvailableGrades() {
+    return await this.dao.getAvailableGrades();
+  }
+  async addSubject(data) {
+    return await this.dao.addSubject(data);
+  }
+  async getSubjects() {
+    return await this.dao.getSubjects();
+  }
+  async addGradeSubjects(data) {
+    return await this.dao.addGradeSubjects(data);
+  }
+  async getGradeSubjects() {
+    return await this.dao.getGradeSubjects();
+  }
+
+  async getGrades() {
+    return await this.dao.getGrades();
+  }
+
+
 }

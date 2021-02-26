@@ -124,14 +124,23 @@ export class UserRouter extends BaseRouter {
     this.router.post('/filelocation',this.getFileLocation.bind(this));
 
     this.router.post('/upload-file',this.uploadSubmission.bind(this));
+    this.router.get('/get-marks-information', this.getMarksInformation.bind(this));
+    this.router.get('/get-grade-information', this.getGrade.bind(this));
+    this.router.get('/get-gpa-information', this.getStudentGPA.bind(this));
+    this.router.post('/submitGrading',this.submitGrading.bind(this));
     this.router.get('/getFile2/:upload_id', (req: any, res) => {
       const upload_id = req.params['upload_id'];
       this.getFile2.bind(this)({...req,upload_id},res);
     });
-
+    this.router.post('/getAssignmentSubmission', (req: any, res) => {
+      const f = req.body.assignment_id
+     //res.json(this.getSubmissionForAssignement(f,res));
+     this.getSubmissionForAssignement(f,res)
+    });
     this.router.get('/get-teacher-subjects', this.getTeacherSubject.bind(this));
 
     this.router.get('/get-available-grades', this.getAvailableGrades.bind(this));
+    this.router.get('/get-teacher-assignmets', this.getTeacherAssignmets.bind(this));
 
     this.router.post('/assingmentsubmit', this.saveAssignment.bind(this));
 
@@ -157,6 +166,12 @@ export class UserRouter extends BaseRouter {
   })
   this.router.get('/get-user-subject', this.getUserSubjects.bind(this));
   this.router.get('/get-user-studyMaterial', this.getUserStudyMaterial.bind(this));
+  
+  this.router.post('/addSubject', this.addSubject.bind(this));
+    this.router.get('/getSubjects', this.getSubjects.bind(this));
+    this.router.get('/getGradeSubjects', this.getGradeSubjects.bind(this));
+    this.router.post('/addGradeSubjects', this.addGradeSubjects.bind(this));
+    this.router.get('/getGrades', this.getGrades.bind(this));
 
 
   }
@@ -241,20 +256,38 @@ export class UserRouter extends BaseRouter {
 
 
 //////////////--------End Student -------------------------
-
+async addSubject(req, res) {
+  const data = req.body;
+  await this.service.addSubject(data)
+  res.json({ msg: 'Subjects Added!', status: 'success' });
+}
+async getSubjects(req, res) {
+  return res.json(await this.service.getSubjects());
+}
+async getGrades(req, res) {
+  return res.json(await this.service.getGrades());
+}
+async addGradeSubjects(req, res) {
+  const data = req.body;
+  await this.service.addGradeSubjects(data)
+  res.json({ msg: 'Subjects Added!', status: 'success' });
+}
+async getGradeSubjects(req, res) {
+  return res.json(await this.service.getGradeSubjects());
+}
 
 
 
   async signupUser(req, res) {
-    const { name, birthday, signInAs, email, password, grade, subject, telephone } = req.body;
+    const { name, birthday, signInAs, email, password, grade_id, subject_id, telephone } = req.body;
     await this.service.saveUser({
       name,
       birthday,
       signInAs,
       email,
       password,
-      grade,
-      subject,
+      grade_id,
+      subject_id,
       telephone,
     });
     res.json({ msg: 'Sign Up Success!', status: 'success' });
@@ -284,18 +317,27 @@ export class UserRouter extends BaseRouter {
   async getUserInformation(req, res) {
     return res.json(await this.service.getUserInformation(req.session.passport.user));
   }
-  async getTeacherSubject(req, res) {
+  // async getTeacherSubject(req, res) {
   
-    return res.json(await this.service.getTeacherSubject(req.session.passport.user));
-  }
+  //   return res.json(await this.service.getTeacherSubject(req.session.passport.user));
+  // }
 
-  async getAvailableGrades(req, res){
-    return res.json(await this.service.getAvailableGrades());
-  }
+  // async getAvailableGrades(req, res){
+  //   return res.json(await this.service.getAvailableGrades());
+  // }
 
   
 
 
+  async getMarksInformation(req, res) {
+    return res.json(await this.service.getMarksInformation(req.session.passport.user));
+  }
+  async getGrade(req, res) {
+    return res.json(await this.service.getGrade(req.session.passport.user));
+  }
+  async getStudentGPA(req, res) {
+    return res.json(await this.service.getStudentGPA(req.session.passport.user));
+  }
   async getFileInfo(req, res) {
     const data = {type: req.type,userType: req.userType, user: req.session.passport.user};
     console.log(data.user);
@@ -307,7 +349,33 @@ export class UserRouter extends BaseRouter {
     return res.download(location, fileName.file_name);
   }
 
-  //Wimukthi's
+  async getTeacherSubject(req, res) {
+  
+    return res.json(await this.service.getTeacherSubject(req.session.passport.user));
+  }
+
+  async getTeacherAssignmets(req, res){
+    return res.json(await this.service.getTeacherAssignmets(req.session.passport.user))
+  }
+
+  async getAvailableGrades(req, res){
+    return res.json(await this.service.getAvailableGrades());
+  }
+
+
+  async submitGrading(req,res){
+    let student_email = req.body.email;
+    let teacher_email = req.session.passport.user;
+    console.log(req.body.upload_id);
+    let assignment_id =await JSON.parse(JSON.stringify(await this.service.getAssignmentID(req.body.upload_id))).assignment_id;
+    console.log(assignment_id);
+    let subject_id = await JSON.parse(JSON.stringify(await this.service.getSubjectID(assignment_id))).subject_id;
+    console.log(subject_id);
+    let marks = req.body.grade;
+    let comment = req.body.comment;
+    return res.json(await this.service.writeToMarksTable(student_email,teacher_email,assignment_id,subject_id,marks,comment));
+    
+  }
 
   async getFile2(req, res) {
     const fileName = await this.service.getFileName(req.upload_id);
@@ -324,4 +392,11 @@ export class UserRouter extends BaseRouter {
     return res.json(await this.service.getUserStudyMaterial(req.session.passport.user));
   }
 //  
+
+  async getSubmissionForAssignement(req, res) {
+
+    return res.json(await this.service.getSubmissionForAssignement(req));
+  }
+
+
 }

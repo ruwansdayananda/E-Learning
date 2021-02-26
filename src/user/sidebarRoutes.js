@@ -13,7 +13,7 @@ export default {
     { to: '/assignments', text: 'Assignments', Icon: <AssignmentIcon /> },
     { to: '/studyMaterials', text: 'Study Materials', Icon: <FileCopyIcon /> },
     { to: '/grades', text: 'Grades', Icon: <GradeIcon /> },
-    { to: '/enrollment', text: 'Enrollment', Icon: <AddCircleOutlineIcon /> },
+    // { to: '/enrollment', text: 'Enrollment', Icon: <AddCircleOutlineIcon /> },
   ],
   teacher: [
     { to: '/assignments', text: 'Assignments', Icon: <AssignmentIcon /> },
@@ -22,6 +22,6 @@ export default {
   ],
   admin: [
     { to: '/courseManagement', text: 'Course Management', Icon: <BallotIcon /> },
-    { to: '/enrollment', text: 'Enrollment', Icon: <AddCircleOutlineIcon /> },
+    // { to: '/enrollment', text: 'Enrollment', Icon: <AddCircleOutlineIcon /> },
   ],
 };
