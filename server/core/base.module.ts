@@ -14,7 +14,6 @@ export class BaseModule {
 
   protected async didInit() {
     //
-
   }
 
   static getInstance() {

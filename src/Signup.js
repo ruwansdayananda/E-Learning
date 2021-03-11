@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@material-ui/core';
 import { Form, FormDate, FormInput, FormSelect } from './core/signup';
-import { useFetch,fetch } from './core/fetch';
+import { useFetch, fetch } from './core/fetch';
 import { Alert } from '@material-ui/lab';
 import { useStyles } from './styles';
 import Grid from '@material-ui/core/Grid';
@@ -31,11 +31,11 @@ export const Signup = () => {
       setGrade('');
       setIsTeacher(true);
       setIsStudent(false);
-    } else if(event.target.value === 'student') {
+    } else if (event.target.value === 'student') {
       setIsStudent(true);
       setIsTeacher(false);
       setTeachingSubject('');
-    }else {
+    } else {
       setIsTeacher(false);
       setIsStudent(false);
       setTeachingSubject('');
@@ -48,28 +48,26 @@ export const Signup = () => {
     setTeachingSubject(subject);
   }
   const SignupSchema = Yup.object().shape({
-    name: Yup.string()
-        .min(3, 'Too Short!')
-        .max(50, 'Too Long!')
-        .required('Required'),
-    birthday: Yup.date().max('2002-12-31','You should be more than 18 years old!').min('1910-12-31','Invalid age restriction!'),
+    name: Yup.string().min(3, 'Too Short!').max(50, 'Too Long!').required('Required'),
+    birthday: Yup.date()
+      .max('2002-12-31', 'You should be more than 18 years old!')
+      .min('1910-12-31', 'Invalid age restriction!'),
     email: Yup.string().email('Invalid email').required('Required'),
-    password: Yup.string()
-        .min(8, 'Too Short!')
-        .max(20, 'Too Long!')
-        .required('Required'),
-    confirmPassword: Yup.string()
-        .oneOf([Yup.ref('password'), null], 'Passwords must match')
+    password: Yup.string().min(8, 'Too Short!').max(20, 'Too Long!').required('Required'),
+    confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match'),
   });
 
   const availableGrades = useFetch({ url: '/api/user/get-available-grades' });
-  const currentSubjects = useFetch({url: '/api/user/getSubjects'});
+  const currentSubjects = useFetch({ url: '/api/user/getSubjects' });
   // const availableSubjects = useFetch({ url: '/api/user/get-available-subjects' });
-  var menuItems = []
+  const menuItems = [];
 
   for (const [index, value] of availableGrades.entries()) {
-
-    menuItems.push(<MenuItem value={value.grade_id}>{value.grade.charAt(0).toUpperCase() + value.grade.slice(1)}</MenuItem>)
+    menuItems.push(
+      <MenuItem value={value.grade_id}>
+        {value.grade.charAt(0).toUpperCase() + value.grade.slice(1)}
+      </MenuItem>,
+    );
   }
   return (
     <Grid container component="main" className={classes.root}>
@@ -83,7 +81,7 @@ export const Signup = () => {
             Sign Up
           </Typography>
           <Form
-              validationSchema={SignupSchema}
+            validationSchema={SignupSchema}
             className={classes.form}
             initialValues={{
               name: '',
@@ -91,12 +89,11 @@ export const Signup = () => {
               signInAs: '',
               grade_id: '',
               subject_id: '',
-              telephone:'',
+              telephone: '',
               birthday: Date.now(),
             }}
-
             onSubmit={async (data) => {
-              console.log(data)
+              console.log(data);
               const res = await fetch({
                 url: '/api/user/signup',
                 method: 'post',
@@ -107,12 +104,12 @@ export const Signup = () => {
                 setTimeout(() => {
                   setShowAlert(false);
                 }, 5000);
-                window.location.pathname = '/login'
+                window.location.pathname = '/login';
               }
             }}
           >
             <FormInput name="name" label="Name" className={classes.formContent} />
-            <FormDate name="birthday" label="Birthday" className={classes.formContent}/>
+            <FormDate name="birthday" label="Birthday" className={classes.formContent} />
             <FormSelect
               onChange={handleChange}
               name="signInAs"
@@ -126,29 +123,33 @@ export const Signup = () => {
             {console.log(teachingSubject)}
             {console.log(currentSubjects)}
             {isTeacher && (
-                <div>
-              <FormSelect
-                name="subject_id"
-                label="Teaching Subject"
-                className={classes.formContent}
-                onChange={getTeachingSubject}
-              >
-              {currentSubjects.map((subject)=><MenuItem value={subject.subject_id}>
-                  {subject.subject}
-                </MenuItem>)}
-              </FormSelect>
-              <FormInput name="telephone" label="Telephone Number" className={classes.formContent} />
-                </div>
+              <div>
+                <FormSelect
+                  name="subject_id"
+                  label="Teaching Subject"
+                  className={classes.formContent}
+                  onChange={getTeachingSubject}
+                >
+                  {currentSubjects.map((subject) => (
+                    <MenuItem value={subject.subject_id}>{subject.subject}</MenuItem>
+                  ))}
+                </FormSelect>
+                <FormInput
+                  name="telephone"
+                  label="Telephone Number"
+                  className={classes.formContent}
+                />
+              </div>
             )}
             {isStudent && (
-                <FormSelect
-                    name="grade_id"
-                    label="Grade"
-                    className={classes.formContent}
-                    onChange={getGrade}
-                >
-                 {menuItems}
-                </FormSelect>
+              <FormSelect
+                name="grade_id"
+                label="Grade"
+                className={classes.formContent}
+                onChange={getGrade}
+              >
+                {menuItems}
+              </FormSelect>
             )}
             <FormInput name="email" label="Email" type="email" className={classes.formContent} />
             <FormInput
@@ -160,12 +161,12 @@ export const Signup = () => {
               className={classes.formContent}
             />
             <FormInput
-                name="confirmPassword"
-                label="Confirm Password"
-                id="confirmPassword"
-                type="password"
-                labelWidth={70}
-                className={classes.formContent}
+              name="confirmPassword"
+              label="Confirm Password"
+              id="confirmPassword"
+              type="password"
+              labelWidth={70}
+              className={classes.formContent}
             />
             {showAlert && <Alert severity="success">This is a success alert — check it out!</Alert>}
             <Button
@@ -180,9 +181,7 @@ export const Signup = () => {
 
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
-
-                </Link>
+                <Link href="#" variant="body2"></Link>
               </Grid>
               <Grid item>
                 <Link href="/login">{'Already have an account? Sign In'}</Link>

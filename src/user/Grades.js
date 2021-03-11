@@ -13,7 +13,6 @@
 //   )
 // };
 
-
 import React from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -78,36 +77,31 @@ const StyledTableRow = withStyles((theme) => ({
 
 export const Grades = () => {
   const classes = useStyles();
-  const gpaInformation = useFetch({ url: '/api/user/get-gpa-information' });
-  console.log(gpaInformation);
-  const userGPA = gpaInformation.gpa;
   const userInformation = useFetch({ url: '/api/user/get-user-information' });
-  console.log(userInformation);
   const userName = userInformation.name;
   const gradeInformation = useFetch({ url: '/api/user/get-grade-information' });
-  console.log(gradeInformation);
   const userClass = gradeInformation.grade;
   const marksInformation = useFetch({ url: '/api/user/get-marks-information' });
-  console.log(marksInformation);
-  function FormRow(){
-    return(
+  function FormRow() {
+    return (
       <React.Fragment>
         <Grid item xs={6}>
-          <Paper className={classes.paper} value={userName}>Name : {userName}</Paper>
+          <Paper className={classes.paper} value={userName}>
+            Name : {userName}
+          </Paper>
         </Grid>
         <Grid item xs={6}>
-          <Paper className={classes.paper} >No. of Subjects : 6</Paper>
+          <Paper className={classes.paper}>No. of Subjects : 6</Paper>
         </Grid>
         <Grid item xs={6}>
-          <Paper className={classes.paper} value={userClass}>Class : {userClass}</Paper>
-        </Grid>
-        <Grid item xs={6}>
-          <Paper className={classes.paper}  value={userGPA}>Overall GPA : {userGPA}</Paper>
+          <Paper className={classes.paper} value={userClass}>
+            Class : {userClass}
+          </Paper>
         </Grid>
       </React.Fragment>
     );
   }
-  
+
   return (
     <div className={classes.pageMainContainer}>
       <div className={classes.pageSubContainer}>
@@ -144,5 +138,5 @@ export const Grades = () => {
         </Table>
       </TableContainer>
     </div>
-  )
+  );
 };

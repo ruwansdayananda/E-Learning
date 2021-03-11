@@ -1,4 +1,4 @@
-import { BaseModule, inject } from '@core/base.module';
+import { BaseModule, inject } from '../core/base.module';
 import { UserDao } from './user.dao';
 
 export class UserService extends BaseModule {
@@ -27,31 +27,37 @@ export class UserService extends BaseModule {
     return await this.dao.getUserInformation(email);
   }
 
-  async listAssignments(email,grade){
-    return await this.dao.listAssignments(email,grade);
+  async listAssignments(email, grade) {
+    return await this.dao.listAssignments(email, grade);
   }
 
-  async getStudentInformation(email){
+  async getStudentInformation(email) {
     return await this.dao.getStudentInformation(email);
   }
 
-  async getFileLocation(upload_id){
+  async getFileLocation(upload_id) {
     return await this.dao.getFileLocation(upload_id);
   }
 
-  async listCompletedAssignments(email){
+  async listCompletedAssignments(email) {
     return await this.dao.listCompletedAssignments(email);
   }
 
-  async writeToUploadsTable(upload_id,filename,file_size,fileExtension,mimetype){
-    return await this.dao.writeToUploadsTable(upload_id,filename,file_size,fileExtension,mimetype);
-  }
-  
-  async writeToSubmissionTable(updated_upload_id,assignment_id,email){
-    return await this.dao.writeToSubmissionTable(updated_upload_id,assignment_id,email);
+  async writeToUploadsTable(upload_id, filename, file_size, fileExtension, mimetype) {
+    return await this.dao.writeToUploadsTable(
+      upload_id,
+      filename,
+      file_size,
+      fileExtension,
+      mimetype,
+    );
   }
 
-  async getLastUploadID(){
+  async writeToSubmissionTable(updated_upload_id, assignment_id, email) {
+    return await this.dao.writeToSubmissionTable(updated_upload_id, assignment_id, email);
+  }
+
+  async getLastUploadID() {
     return await this.dao.getLastUploadID();
   }
 
@@ -76,19 +82,23 @@ export class UserService extends BaseModule {
   async getGrade(email) {
     return await this.dao.getGrade(email);
   }
-  async getStudentGPA(email) {
-    return await this.dao.getStudentGPA(email);
-  }
 
-  async getAssignmentID(upload_id){
+  async getAssignmentID(upload_id) {
     return await this.dao.getAssignmentID(upload_id);
   }
 
-  async getSubjectID(assignment_id){
+  async getSubjectID(assignment_id) {
     return await this.dao.getSubjectID(assignment_id);
   }
-  async writeToMarksTable(student_email,teacher_email,assignment_id,subject_id,marks,comment){
-    return await this.dao.writeToMarksTable(student_email,teacher_email,assignment_id,subject_id,marks,comment);
+  async writeToMarksTable(student_email, teacher_email, assignment_id, subject_id, marks, comment) {
+    return await this.dao.writeToMarksTable(
+      student_email,
+      teacher_email,
+      assignment_id,
+      subject_id,
+      marks,
+      comment,
+    );
   }
 
   async getSubmissionForAssignement(data) {
@@ -119,6 +129,4 @@ export class UserService extends BaseModule {
   async getGrades() {
     return await this.dao.getGrades();
   }
-
-
 }

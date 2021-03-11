@@ -1,5 +1,9 @@
 {
   "scripts": {
     "start": "ts-node-dev -- ./index.ts"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3",
+    "ts-node": "^9.1.1"
   }
 }
