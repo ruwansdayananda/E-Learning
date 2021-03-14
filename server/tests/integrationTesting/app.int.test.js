@@ -1,19 +1,24 @@
 const request = require('supertest');
 const { main } = require('../../dist/main');
 
-beforeEach(() => {
+
+beforeEach(async () => {
   console.log('beforeEach');
+  
 });
+
 
 test('login for a user', async () => {
   await request(await main())
     .post('/api/user/login')
     .send({
-      email: 'student@gmail.com',
-      password: 'passwordd',
+      email: 'supun@uom.lk',
+      password: '12345678',
     })
-    .expect(400);
+    .expect(200);
+  
 });
+
 
 // name: 'Wimukthi',
 //     birthday: '1997-03-17',
